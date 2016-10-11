@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <!--
+    * Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. * Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written *
+    authorization of TRGR is prohibited
+  -->
+<ivysettings>
+  <property name="local.base-path" value="E://ivy2" override="false" />
+  <property name="local-deprecated.base-path" value="E://ivy" override="false" />
+  <resolvers>
+    <filesystem name="local-integration" checkmodified="true" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+
+    <filesystem name="local-integration-deprecated" checkmodified="true" cache="local-project-cache">
+      <ivy pattern="${local-deprecated.base-path}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local-deprecated.base-path}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+
+    <filesystem name="local-thirdparty" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+    
+     <url name="shared-thirdparty">
+      <ivy pattern="${shared.base-url}/${thirdparty.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${shared.base-url}/${thirdparty.token}/${ivy.settings.artifact-pattern}" />
+    </url>
+    
+    <chain name="environment-chain" returnFirst="true">
+      <resolver ref="local-integration" />
+      <resolver ref="local-integration-deprecated" />
+      <resolver ref="local-thirdparty" />
+      <resolver ref="shared-thirdparty" />
+    </chain>
+  </resolvers>
+</ivysettings>

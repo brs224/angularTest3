@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. 
+Proprietary and Confidential information of TRGR. Disclosure, Use or 
+Reproduction without the written authorization of TRGR is prohibited.
+
+TFS Operations - This file contains operations for interacting with
+Team Foundation Server.
+-->
+<project name="tfs-operations">
+
+    <target name="-initialize-tfs">
+        <property name="teamprise.lib.dir" value="${basedir}/tools/teamprise/lib/" />
+
+        <typedef resource="com/teamprise/ant/antlib.xml">
+            <classpath>
+                <fileset dir="${teamprise.lib.dir}" includes="*.jar" />
+            </classpath>
+        </typedef>
+
+        <fail unless="env.TEAMPRISE_CLC_HOME" 
+              message="To check out projects from TFS, the TEAMPRISE_CLC_HOME environment variablemust be set." />
+        <property name="tfs.vc.executable" value="${env.TEAMPRISE_CLC_HOME}\tf.cmd" />
+        <property name="tfs.server" value="${tfs.server}" />
+        <property name="tfs.username" value="${tfs.username}" />
+        <property name="tfs.password" value="${tfs.password}" />
+    </target>
+
+    <target name="tfsget" depends="initialize,-initialize-tfs">
+        <tfsget localpath="." />
+    </target>
+
+</project>
