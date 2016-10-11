@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+ !
+ ! Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+ ! Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+ ! authorization of TRGR is prohibited.
+ !
+ ! This file defines Ant setup tasks for WPT's checkstyle integration.
+ -->
+
+<project name="checkstyle-build">
+
+    <target name="-load-checkstyle-properties">
+        <property name="checkstyle.lib.dir" value="${basedir}/tools/checkstyle/lib" />
+        <property name="checkstyle.config.file"
+                  value="${basedir}/tools/checkstyle/config/sun_checks.xml" />
+        <property name="checkstyle.xsl.file"
+                  value="${basedir}/tools/checkstyle/xsl/checkstyle-noframes.xsl" />
+        <property name="checkstyle.report.dir" value="${build.dir}/reports/style/java" />
+        <property name="checkstyle.report.file"
+                  value="${build.dir}/reports/style/java/checkstyle-report.html" />
+        <property name="checkstyle.excludes" value="" />
+    </target>
+
+    <target name="-initialize-checkstyle">
+        <taskdef resource="checkstyletask.properties">
+            <classpath>
+                <fileset dir="${checkstyle.lib.dir}" includes="*.jar" />
+            </classpath>
+        </taskdef>
+    </target>
+
+    <target name="generate-java-style-reports" 
+            depends="initialize,-load-checkstyle-properties,-initialize-checkstyle,init-compile-classpath">
+        <mkdir dir="${checkstyle.report.dir}" />
+        <checkstyle config="${checkstyle.config.file}"
+                    failOnViolation="false"
+                    classpathref="java.compile.classpath">
+            <fileset dir="${java.src.dir}" includes="**/*.java" excludes="${checkstyle.excludes}" />
+            <formatter type="xml" toFile="${checkstyle.report.dir}/checkstyle_out.xml" />
+        </checkstyle>
+        <xslt in="${checkstyle.report.dir}/checkstyle_out.xml"
+              out="${checkstyle.report.file}"
+              style="${checkstyle.xsl.file}" />
+    </target>
+
+</project>

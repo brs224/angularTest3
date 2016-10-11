@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+    authorization of TRGR is prohibited.
+
+    Java library configuration - This file contains configuration properties needed
+    for integration of java library features with the build.
+-->
+<project name="java-library-build">
+
+    <target name="-load-java-library-properties">
+        <property name="jar.name" value="${dist.basename}.jar" />
+    </target>
+
+    <target name="create-jar" depends="initialize,-load-java-library-properties,compile-source" description="Creates a JAR file">
+        <mkdir dir="${dist.dir}" />
+        <jar destfile="${dist.dir}/${jar.name}" basedir="${java.classes.dir}" update="false">
+            <manifest>
+                <attribute name="Implementation-Title" value="${dist.basename}" />
+                <attribute name="Release-Date" value="${iso.8601.timestamp}" />
+                <attribute name="Release-Label" value="${label}" />
+                <attribute name="Implementation-Date" value="${iso.8601.timestamp}" />
+                <attribute name="WPT-Version" value="${wpt.version}" />
+            </manifest>
+            <fileset dir="${java.resource.dir}" />
+        </jar>
+    </target>
+
+</project>

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="workorder" name="Work Order Process" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:executionListener event="start" expression="#{onProcessBeginListerner.notify(execution)}"></activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="createWorkOrder" name="Create Work Order">
+      <extensionElements>
+        <activiti:taskListener event="create" expression="#{onHumanTaskListerner.notify(execution)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="createWorkOrder"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Cancel?" default="cancel"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="createWorkOrder" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="cancel" name="Cancel" sourceRef="exclusivegateway1" targetRef="endevent1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="reviewEventFlow"></exclusiveGateway>
+    <sequenceFlow id="submit" name="Submit" sourceRef="exclusivegateway1" targetRef="exclusivegateway2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outcome == 'submit'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="editWorkOrder" name="Edit Task">
+      <extensionElements>
+        <activiti:taskListener event="create" expression="#{onHumanTaskListerner.notify(execution)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <subProcess id="subprocess1" name="Work Stream Sub Process">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${workstreamcount}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="startevent2" name="Start"></startEvent>
+      <serviceTask id="createWS" name="Create Work Streams" activiti:expression="#{onServiceTaskListerner.notify(execution)}"></serviceTask>
+      <sequenceFlow id="flow14" sourceRef="startevent2" targetRef="createWS"></sequenceFlow>
+      <receiveTask id="receivetask1" name="Update Work Order">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="#{onServiceTaskListerner.notify(execution)}"></activiti:executionListener>
+        </extensionElements>
+      </receiveTask>
+      <sequenceFlow id="flow19" sourceRef="createWS" targetRef="receivetask1"></sequenceFlow>
+      <endEvent id="endevent6" name="End"></endEvent>
+      <sequenceFlow id="flow20" sourceRef="receivetask1" targetRef="endevent6"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="createWorkStreamsFlow" sourceRef="exclusivegateway2" targetRef="subprocess1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${workstreamcount > 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="subprocess1" targetRef="editWorkOrder"></sequenceFlow>
+    <userTask id="reviewWorkOrder" name="Review Event">
+      <extensionElements>
+        <activiti:taskListener event="create" expression="#{onHumanTaskListerner.notify(execution)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="reviewEventFlow" sourceRef="exclusivegateway2" targetRef="reviewWorkOrder"></sequenceFlow>
+    <subProcess id="subprocess2" name="Work Stream Sub Process">
+      <startEvent id="startevent3" name="Start"></startEvent>
+      <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway" default="editWorkStreamsFlow"></exclusiveGateway>
+      <serviceTask id="addWS" name="Add Work Strean" activiti:expression="#{onServiceTaskListerner.notify(execution)}"></serviceTask>
+      <sequenceFlow id="addWorkStreamsFlow" sourceRef="exclusivegateway4" targetRef="addWS">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'new'}]]></conditionExpression>
+      </sequenceFlow>
+      <receiveTask id="receivetask2" name="Update Work Order">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="#{onServiceTaskListerner.notify(execution)}"></activiti:executionListener>
+        </extensionElements>
+      </receiveTask>
+      <sequenceFlow id="flow26" sourceRef="addWS" targetRef="receivetask2"></sequenceFlow>
+      <endEvent id="endevent8" name="End"></endEvent>
+      <sequenceFlow id="flow27" sourceRef="receivetask2" targetRef="endevent8"></sequenceFlow>
+      <sequenceFlow id="editWorkStreamsFlow" sourceRef="exclusivegateway4" targetRef="endevent8"></sequenceFlow>
+      <sequenceFlow id="flow40" sourceRef="startevent3" targetRef="exclusivegateway4"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow21" sourceRef="editWorkOrder" targetRef="subprocess2"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway" default="end1"></exclusiveGateway>
+    <sequenceFlow id="flow29" sourceRef="subprocess2" targetRef="exclusivegateway5"></sequenceFlow>
+    <sequenceFlow id="editTaskFlow" sourceRef="exclusivegateway5" targetRef="editWorkOrder">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status != 'done'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="reviewCulledWorkOrder" name="Review Culled Event">
+      <extensionElements>
+        <activiti:taskListener event="create" expression="#{onHumanTaskListerner.notify(execution)}"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="end"></exclusiveGateway>
+    <sequenceFlow id="flow34" sourceRef="reviewCulledWorkOrder" targetRef="exclusivegateway7"></sequenceFlow>
+    <sequenceFlow id="flow37" name="Restore" sourceRef="exclusivegateway7" targetRef="reviewWorkOrder">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outcome == 'restore'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent11" name="End"></endEvent>
+    <sequenceFlow id="end1" sourceRef="exclusivegateway5" targetRef="endevent11"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway" default="createWorkStreamsFlow1"></exclusiveGateway>
+    <sequenceFlow id="flow42" sourceRef="reviewWorkOrder" targetRef="exclusivegateway8"></sequenceFlow>
+    <sequenceFlow id="cullFlow" name="Cull" sourceRef="exclusivegateway8" targetRef="reviewCulledWorkOrder">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${outcome == 'cull'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="createWorkStreamsFlow1" sourceRef="exclusivegateway8" targetRef="subprocess1"></sequenceFlow>
+    <endEvent id="endevent12" name="End"></endEvent>
+    <sequenceFlow id="end" sourceRef="exclusivegateway7" targetRef="endevent12"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_workorder">
+    <bpmndi:BPMNPlane bpmnElement="workorder" id="BPMNPlane_workorder">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createWorkOrder" id="BPMNShape_createWorkOrder">
+        <omgdc:Bounds height="55.0" width="131.0" x="130.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="309.0" y="145.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="306.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="390.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="editWorkOrder" id="BPMNShape_editWorkOrder">
+        <omgdc:Bounds height="55.0" width="105.0" x="957.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+        <omgdc:Bounds height="205.0" width="381.0" x="530.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="540.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createWS" id="BPMNShape_createWS">
+        <omgdc:Bounds height="72.0" width="105.0" x="590.0" y="72.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="receivetask1" id="BPMNShape_receivetask1">
+        <omgdc:Bounds height="72.0" width="105.0" x="720.0" y="72.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="870.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewWorkOrder" id="BPMNShape_reviewWorkOrder">
+        <omgdc:Bounds height="55.0" width="105.0" x="359.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess2" id="BPMNShape_subprocess2">
+        <omgdc:Bounds height="205.0" width="612.0" x="703.0" y="375.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent3" id="BPMNShape_startevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="733.0" y="462.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="933.0" y="459.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="addWS" id="BPMNShape_addWS">
+        <omgdc:Bounds height="62.0" width="105.0" x="999.0" y="449.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="receivetask2" id="BPMNShape_receivetask2">
+        <omgdc:Bounds height="67.0" width="105.0" x="1127.0" y="446.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
+        <omgdc:Bounds height="35.0" width="35.0" x="1279.0" y="462.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="1323.0" y="457.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewCulledWorkOrder" id="BPMNShape_reviewCulledWorkOrder">
+        <omgdc:Bounds height="71.0" width="105.0" x="477.0" y="375.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="509.0" y="520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent11" id="BPMNShape_endevent11">
+        <omgdc:Bounds height="35.0" width="35.0" x="1415.0" y="561.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway8" id="BPMNShape_exclusivegateway8">
+        <omgdc:Bounds height="40.0" width="40.0" x="509.0" y="288.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent12" id="BPMNShape_endevent12">
+        <omgdc:Bounds height="35.0" width="35.0" x="594.0" y="523.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="261.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="306.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cancel" id="BPMNEdge_cancel">
+        <omgdi:waypoint x="326.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="326.0" y="145.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="40.0" x="277.0" y="93.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="submit" id="BPMNEdge_submit">
+        <omgdi:waypoint x="346.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="77.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="346.0" y="77.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="575.0" y="107.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="108.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="695.0" y="108.0"></omgdi:waypoint>
+        <omgdi:waypoint x="720.0" y="108.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="825.0" y="108.0"></omgdi:waypoint>
+        <omgdi:waypoint x="870.0" y="107.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="createWorkStreamsFlow" id="BPMNEdge_createWorkStreamsFlow">
+        <omgdi:waypoint x="430.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="529.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="122.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="911.0" y="122.0"></omgdi:waypoint>
+        <omgdi:waypoint x="957.0" y="122.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reviewEventFlow" id="BPMNEdge_reviewEventFlow">
+        <omgdi:waypoint x="410.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="411.0" y="280.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="addWorkStreamsFlow" id="BPMNEdge_addWorkStreamsFlow">
+        <omgdi:waypoint x="973.0" y="479.0"></omgdi:waypoint>
+        <omgdi:waypoint x="999.0" y="480.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="1104.0" y="480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1127.0" y="479.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="1232.0" y="479.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1279.0" y="479.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="editWorkStreamsFlow" id="BPMNEdge_editWorkStreamsFlow">
+        <omgdi:waypoint x="953.0" y="459.0"></omgdi:waypoint>
+        <omgdi:waypoint x="952.0" y="403.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1124.0" y="403.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1296.0" y="403.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1296.0" y="462.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
+        <omgdi:waypoint x="768.0" y="479.0"></omgdi:waypoint>
+        <omgdi:waypoint x="933.0" y="479.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="1009.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1009.0" y="375.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="1315.0" y="477.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1323.0" y="477.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="editTaskFlow" id="BPMNEdge_editTaskFlow">
+        <omgdi:waypoint x="1343.0" y="457.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1342.0" y="122.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1062.0" y="122.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="529.0" y="446.0"></omgdi:waypoint>
+        <omgdi:waypoint x="529.0" y="520.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
+        <omgdi:waypoint x="509.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="411.0" y="539.0"></omgdi:waypoint>
+        <omgdi:waypoint x="411.0" y="335.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="45.0" x="360.0" y="481.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="end1" id="BPMNEdge_end1">
+        <omgdi:waypoint x="1343.0" y="497.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1343.0" y="578.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1415.0" y="578.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow42" id="BPMNEdge_flow42">
+        <omgdi:waypoint x="464.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="509.0" y="308.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="cullFlow" id="BPMNEdge_cullFlow">
+        <omgdi:waypoint x="529.0" y="328.0"></omgdi:waypoint>
+        <omgdi:waypoint x="529.0" y="375.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="529.0" y="328.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="createWorkStreamsFlow1" id="BPMNEdge_createWorkStreamsFlow1">
+        <omgdi:waypoint x="549.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="719.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="720.0" y="225.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="end" id="BPMNEdge_end">
+        <omgdi:waypoint x="549.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="594.0" y="540.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
