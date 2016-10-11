@@ -21,6 +21,7 @@ resources/java/environment/local.application.properties
 .classpath
 .settings/
 .loadpath
+.bpmn
 
 # External tool builders
 .externalToolBuilders/
