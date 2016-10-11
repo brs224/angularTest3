@@ -9,6 +9,6 @@
 <body>
     <h1>GRC Workflow Application Page</h1>
     
-    <h2>Nothing to see here</h2>
+    <h2>App Level</h2>
 </body>
 </html>
