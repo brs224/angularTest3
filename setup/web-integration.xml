@@ -133,6 +133,7 @@
                 <include name="css/**" />
                 <include name="images/**" />
                 <include name="js/**" />
+                <include name="app/**" />
                 <include name="pages/**" />
             </fileset>
             <fileset dir="${build.dir}">
