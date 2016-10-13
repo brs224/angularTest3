@@ -35,10 +35,10 @@ public class SecurityServiceWebImpl implements SecurityServiceWeb {
 	public static final String HEADER_SESSION_TOKEN = "X-West-session-token";
 
 	// Cookie Names
-	protected static final String COOKIE_SESSION_TOKEN = "jwSessionToken";
-	protected static final String COOKIE_USER_FIRST_NAME = "jwUserFirstName";
-	protected static final String COOKIE_USER_LAST_NAME = "jwUserLastName";
-	protected static final String COOKIE_USER_ID = "jwUserId";
+	protected static final String COOKIE_SESSION_TOKEN = "grcSessionToken";
+	protected static final String COOKIE_USER_FIRST_NAME = "grcUserFirstName";
+	protected static final String COOKIE_USER_LAST_NAME = "grcUserLastName";
+	protected static final String COOKIE_USER_ID = "grcUserId";
 	protected static final String COOKIE_LOGIN_TIME = "safeLoginTime";
 
 	// Request Parameters returned from SecurityService
