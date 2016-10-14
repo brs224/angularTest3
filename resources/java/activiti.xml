@@ -22,6 +22,7 @@
 				<entry key="onGateWayEntryListener" value-ref="onGateWayEntryListener" />
 				<entry key="onProcessEndListerner" value-ref="onProcessEndListerner" />
 				<entry key="onHumanTaskListerner" value-ref="onHumanTaskListerner" />
+				<entry key="onUserTaskListener" value-ref="onUserTaskListener" />
 			 </map>
 		</property>
 
@@ -76,4 +77,5 @@
     <bean id="onGateWayEntryListener" class="com.thomsonreuters.grc.workflow.activiti.engine.listeners.OnGateWayEntryListener"/>
     <bean id="onProcessEndListerner" class="com.thomsonreuters.grc.workflow.activiti.engine.listeners.OnProcessEndListerner"/>
     <bean id="onHumanTaskListerner" class="com.thomsonreuters.grc.workflow.activiti.engine.listeners.OnHumanTaskListener"/>
+    <bean id="onUserTaskListener" class="com.thomsonreuters.grc.workflow.activiti.engine.listeners.OnUserTaskListener"/>
 </beans>

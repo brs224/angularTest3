@@ -1,5 +1,7 @@
 package com.thomsonreuters.grc.workflow.activiti.domain;
 
+import java.util.Map;
+
 public class BpmTask {
 	
 	private String taskId;
@@ -25,6 +27,7 @@ public class BpmTask {
 	private String priority; 
 	private String outcome;      
 	private String state; 
+	private Map<String,Object> processVariables;
 	
 	public String getTaskId() {
 		return taskId;
@@ -164,4 +167,12 @@ public class BpmTask {
 	public void setState(String state) {
 		this.state = state;
 	}
+	public Map<String, Object> getProcessVariables() {
+	    return processVariables;
+	}
+	public void setProcessVariables(Map<String, Object> processVariables) {
+	    this.processVariables = processVariables;
+	}
+	
+	
 }

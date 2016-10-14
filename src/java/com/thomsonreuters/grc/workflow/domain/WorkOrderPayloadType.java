@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class WorkOrderPayloadType {
 
-    @XmlElement
+    @XmlElement(required = true)
     protected WorkOrderType workOrder;
     @XmlElement
     protected ActionType action;

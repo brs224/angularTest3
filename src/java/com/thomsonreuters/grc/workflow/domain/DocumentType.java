@@ -49,6 +49,17 @@ import javax.xml.datatype.XMLGregorianCalendar;
     
 })
 public class DocumentType {
+    
+    public DocumentType() {
+	artifactDescriptorId = "";
+	cite = "";
+	complianceCompleteContentType = "";
+	complianceCompleteContentTypeId = "";
+	country = "";
+	proxyUUID = "";
+	title = "";
+	countryConceptId = "";
+    }
 
     @XmlElement
     protected String id;

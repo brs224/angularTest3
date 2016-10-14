@@ -8,6 +8,7 @@ public class WorkOrderTask {
 	private String taskName;
 	private WorkOrderPayloadType workOrderPayload;
 	private String taskId;
+	private String workOrderId;
 	
 	public String getTaskName() {
 	    return taskName;
@@ -27,6 +28,12 @@ public class WorkOrderTask {
 	}
 	public void setTaskId(String taskId) {
 	    this.taskId = taskId;
-	}	
+	}
+	public String getWorkOrderId() {
+	    return workOrderId;
+	}
+	public void setWorkOrderId(String workOrderId) {
+	    this.workOrderId = workOrderId;
+	}		
 
 }
