@@ -18,8 +18,8 @@ public enum OutcomeSourceType {
     @XmlEnumValue("WorkSpace")
     WORK_SPACE("WorkSpace"),
     
-    @XmlEnumValue("Activit")
-    ACTVITI("Activiti");
+    @XmlEnumValue("Activiti")
+    ACTIVITI("Activiti");
     
     private final String value;
 

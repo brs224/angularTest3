@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,11 +33,11 @@ public class BPMRestService {
 
     @GET
     @Path("/createInstance/{processName}")
-    @Produces({ MediaType.TEXT_PLAIN })
-    public String createInstance(@PathParam("processName") String processName, @QueryParam("workOrderId") String workOrderId) {
-	//String workOrderId = "123";
-	bpmTaskService.createInstance(processName, workOrderId);
-	return "Create_Instance_SUCCESS " + processName;
+    @Produces({ MediaType.APPLICATION_JSON })
+    public WorkOrderTask createInstance(@PathParam("processName") String processName,
+	    @QueryParam("workOrderId") String workOrderId) {
+	WorkOrderTask ret = bpmTaskService.createInstance(processName, workOrderId);
+	return ret;
     }
 
     @GET
@@ -61,7 +63,7 @@ public class BPMRestService {
 
     @GET
     @Path("/getWorkOrderTask/{taskId}")
-    @Produces({ MediaType.APPLICATION_XML })
+    @Produces({ MediaType.APPLICATION_JSON })
     public WorkOrderTask getWorkOrderTask(@PathParam("taskId") String taskId) {
 	WorkOrderTask ret = null;
 	try {
@@ -72,21 +74,52 @@ public class BPMRestService {
 
 	return ret;
     }
-    
+
     @GET
     @Path("/updatetWorkOrderTask/{taskId}")
     @Produces({ MediaType.APPLICATION_JSON })
-    public WorkOrderTask updateWorkOrderTask(@PathParam("taskId") String taskId, WorkOrderTask workOrderPayload) {
+    public WorkOrderTask updateWorkOrderTask(@PathParam("taskId") String taskId, WorkOrderTask workOrderTask) {
 	WorkOrderTask ret = null;
 	try {
-	    ret = bpmTaskService.updateWorkOrderTask(taskId, workOrderPayload);
+	    ret = bpmTaskService.updateWorkOrderTask(taskId, workOrderTask);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
 
 	return ret;
     }
+
+    @PUT
+    @Path("{taskId}/{outcome}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public WorkOrderTask updateTaskWithOutcome(@PathParam("taskId") String taskId, @PathParam("outcome") String outcome,
+	    WorkOrderTask workOrderTask) {
+	WorkOrderTask ret = null;
+	try {
+	    ret = bpmTaskService.updateWorkOrderTaskWithOutcome(taskId, outcome, workOrderTask);
+	} catch (Exception e) {	   
+	    e.printStackTrace();
+	}
+	return ret;
+    }
     
+
+    @PUT
+    @Path("/claim/{taskId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON })
+    public String claimTask(@PathParam("taskId") String taskId) {
+	String ret = null;
+	try {
+	    ret = bpmTaskService.claimTask(taskId);
+	} catch (Exception e) {
+	    ret = "Failure";
+	    e.printStackTrace();
+	}
+	return ret;
+    }
+
     public BpmTaskService getBpmTaskService() {
 	return bpmTaskService;
     }

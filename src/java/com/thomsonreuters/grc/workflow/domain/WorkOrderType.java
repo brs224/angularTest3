@@ -4,12 +4,7 @@
 // Any modifications to this file will be lost upon recompilation of the source schema. 
 // Generated on: 2013.02.14 at 02:16:36 PM CST 
 //
-
-
 package com.thomsonreuters.grc.workflow.domain;
-
-import java.beans.Transient;
-import java.math.BigInteger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -38,8 +33,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class WorkOrderType {
 
-    @XmlElement
-    protected BigInteger id;
+    @XmlElement(required = true)
+    protected int id;
     @XmlElement
     protected String uuid;
     @XmlElement
@@ -62,7 +57,7 @@ public class WorkOrderType {
     protected String workProductType;
     @XmlElement
     protected String sectorsConceptIds;
-    @XmlElement
+    @XmlElement(required = true)
     protected DocumentType sourceDocument;
     @XmlElement
     protected WorkStreamListType workStreams;
@@ -71,11 +66,11 @@ public class WorkOrderType {
     	
     }
 
-    public BigInteger getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(int id) {
         this.id = id;
     }
 

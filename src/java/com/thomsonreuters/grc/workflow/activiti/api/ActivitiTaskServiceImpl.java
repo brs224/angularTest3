@@ -37,7 +37,7 @@ public class ActivitiTaskServiceImpl {
 	bpmInstance.setProcessName(instance.getProcessDefinitionName());
 
 	System.out.println("instance: " + instance.getId() + " ; " + instance.getProcessDefinitionId() + " ; "
-		+ instance.getProcessDefinitionId() + " ; " + instance.getProcessDefinitionName());
+		+ instance.getProcessDefinitionId());
 	return bpmInstance;
     }
 
@@ -49,11 +49,13 @@ public class ActivitiTaskServiceImpl {
 	this.processEngine = processEngine;
     }
 
-    public void completeTask(BpmTask bpmTask) {
-	Map<String, Object> variables = new HashMap<String, Object>();
-	variables.put("priority", "low");
-	taskService.complete(bpmTask.getTaskId(), variables);
-	return;
+    public void completeTask(String taskId, Map<String,Object> variables) {
+	taskService.complete(taskId, variables);
+    }
+    
+    
+    public void claimTask(String taskId) {
+	taskService.claim(taskId, "Smitha");
     }
 
     public String processEngineName() {
@@ -66,16 +68,17 @@ public class ActivitiTaskServiceImpl {
 
     public BpmTask getCurrentTask(String processInstanceId) {
 	BpmTask bpmTask = null;
-	TaskQuery query = taskService.createTaskQuery().processInstanceId(processInstanceId);
+	TaskQuery query = taskService.createTaskQuery().processInstanceId(processInstanceId).includeProcessVariables();
 	Task task = query.singleResult();
-	System.out.println(" task.getId() ** " + task.getId());
 	if(task!=null) {
 	    bpmTask = new BpmTask();
 	    bpmTask.setTaskId(task.getId());
 	    bpmTask.setAssignees(task.getAssignee());
 	    bpmTask.setActivityName(task.getName());
 	    bpmTask.setInstanceId(task.getProcessInstanceId()); 
-	    bpmTask.setTaskName(task.getName());
+	    bpmTask.setTaskName(task.getTaskDefinitionKey());
+	    bpmTask.setProcessVariables(task.getProcessVariables());
+    
 	}
 	return bpmTask;
     }

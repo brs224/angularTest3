@@ -10,7 +10,7 @@ public class OnHumanTaskListener implements ExecutionListener{
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 	    
-	       String instanceId = execution.getProcessInstanceId();
+	        String instanceId = execution.getProcessInstanceId();
 		String activitiName = execution.getCurrentActivityId();
 		System.out.println("OnHumanTaskListerner: ["+activitiName + ": " + instanceId +  "] ");			
 		
