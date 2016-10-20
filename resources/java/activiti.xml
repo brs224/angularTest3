@@ -42,15 +42,21 @@
 
     <bean id="activitiTaskService" class="com.thomsonreuters.grc.workflow.activiti.api.ActivitiTaskServiceImpl">
     </bean>
+    <bean id="activitiIdentityService" class="com.thomsonreuters.grc.workflow.activiti.api.ActivitiIdentityServiceImpl">
+    </bean>
 
-    <bean id="bpmDAOImpl" class="com.thomsonreuters.grc.workflow.dao.impl.BpmDAOImpl">
+    <bean id="workflowDAOImpl" class="com.thomsonreuters.grc.workflow.dao.impl.WorkflowDAOImpl">
         <property name="grcActivitiDataSource" ref="grcActivitiDataSource" />
     </bean>
     
-    <bean id="bpmTaskService" class="com.thomsonreuters.grc.workflow.service.BpmTaskService">
+    <bean id="workflowTaskService" class="com.thomsonreuters.grc.workflow.service.WorkflowTaskService">
     </bean>
     
-    <bean id="bpmRest" class="com.thomsonreuters.grc.workflow.resources.BPMRestService">
+    <bean id="workflowIdentityService" class="com.thomsonreuters.grc.workflow.service.WorkflowIdentityService">
+        <property name="securityClientUrl" value="${jetstream.security.url}" />
+    </bean>
+    
+    <bean id="workflowRest" class="com.thomsonreuters.grc.workflow.resources.WorkflowRestService">
     </bean>
     
     <bean id="activitiDataSource"

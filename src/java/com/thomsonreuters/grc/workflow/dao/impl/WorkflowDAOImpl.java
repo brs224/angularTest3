@@ -15,7 +15,7 @@ import com.thomsonreuters.grc.workflow.activiti.domain.BpmTask;
 import com.thomsonreuters.grc.workflow.domain.WorkOrderType;
 import com.thomsonreuters.grc.workflow.domain.WorkStreamType;
 
-public class BpmDAOImpl {
+public class WorkflowDAOImpl {
 
     @Autowired
     private DataSource grcActivitiDataSource;
