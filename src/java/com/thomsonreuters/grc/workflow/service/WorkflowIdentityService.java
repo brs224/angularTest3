@@ -1,5 +1,7 @@
 package com.thomsonreuters.grc.workflow.service;
 
+import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 
 import org.activiti.engine.impl.util.json.JSONObject;
@@ -89,11 +91,23 @@ public class WorkflowIdentityService {
 		return activitiIdentityService.getUser(userId);
 	}
 	
+	public List<WorkflowUser> getUsers(){
+		return activitiIdentityService.getUsers();
+	}
+	
 	public WorkflowGroup getGroup(String groupId){
 		return activitiIdentityService.getGroup(groupId);
 	}
 	
+	public List<WorkflowGroup> getGroups(){
+		return activitiIdentityService.getGroups();
+	}
 	
+	public List<WorkflowGroup> getGroupsForUser(String userId){
+		return activitiIdentityService.getGroupsForUser(userId);
+	}
+	
+
 	public String getSecurityClientUrl() {
 		return securityClientUrl;
 	}

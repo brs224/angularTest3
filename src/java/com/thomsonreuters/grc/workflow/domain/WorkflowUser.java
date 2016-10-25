@@ -1,16 +1,18 @@
 package com.thomsonreuters.grc.workflow.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "workflowUser")
 public class WorkflowUser implements Serializable {
-	private  String id;
-	private  String firstName;
-	private  String lastName;
-	private  String displayName;
-	private  String email;
+	private String id;
+	private String firstName;
+	private String lastName;
+	private String displayName;
+	private String email;
+	private List<WorkflowGroup> groups;
 
 	public String getId() {
 		return id;
@@ -50,5 +52,13 @@ public class WorkflowUser implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public List<WorkflowGroup> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<WorkflowGroup> groups) {
+		this.groups = groups;
 	}
 }
