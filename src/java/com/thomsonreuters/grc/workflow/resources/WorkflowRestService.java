@@ -79,8 +79,9 @@ public class WorkflowRestService {
 	return ret;
     }
 
-    @GET
+    @PUT
     @Path("/updatetWorkOrderTask/{taskId}")
+    @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public WorkOrderTask updateWorkOrderTask(@PathParam("taskId") String taskId, WorkOrderTask workOrderTask) {
 	WorkOrderTask ret = null;
@@ -124,17 +125,15 @@ public class WorkflowRestService {
 	return ret;
     }
     
-    @POST
+    @GET
     @Path("/identity/createUser/{userId}")
-    @Consumes({ MediaType.TEXT_PLAIN })
     @Produces({ MediaType.TEXT_PLAIN })
     public String createNewUser(@PathParam("userId") String userId){
     	return workflowIdentityService.addUser(userId);
     }
 
-    @POST
+    @GET
     @Path("/identity/createGroup/{groupId}")
-    @Consumes({ MediaType.TEXT_PLAIN })
     @Produces({ MediaType.TEXT_PLAIN })
     public String createNewGroup(@PathParam("groupId") String groupId, @QueryParam ("groupName")String groupName){
     	
@@ -149,15 +148,36 @@ public class WorkflowRestService {
     }
 
     @GET
+    @Path("/identity/getUsers")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<WorkflowUser> getUsers(){
+    	return workflowIdentityService.getUsers();
+    }
+
+    @GET
     @Path("/identity/getGroup/{groupId}")
     @Produces({ MediaType.APPLICATION_JSON })
     public WorkflowGroup getGroup(@PathParam("groupId") String groupId){
     	return workflowIdentityService.getGroup(groupId);
     }
 
-    @POST
+    @GET
+    @Path("/identity/getGroups")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<WorkflowGroup> getGroups(){
+    	return workflowIdentityService.getGroups();
+    }
+
+    @GET
+    @Path("/identity/getGroups/{userId}")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public List<WorkflowGroup> getGroupsForUser(@PathParam("userId") String userId){
+    	return workflowIdentityService.getGroupsForUser(userId);
+    }
+
+
+    @GET
     @Path("/identity/addUserToGroup")
-    @Consumes({ MediaType.TEXT_PLAIN })
     @Produces({ MediaType.TEXT_PLAIN })
     public String addUserToGroup(@QueryParam("userId") String userId, @QueryParam("groupId") String groupId){
     	return workflowIdentityService.addUserToGroup(userId, groupId);

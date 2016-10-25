@@ -1,5 +1,8 @@
 package com.thomsonreuters.grc.workflow.activiti.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
@@ -49,15 +52,42 @@ public class ActivitiIdentityServiceImpl {
 		// must use the queries to fetch details about a user
 		User user = identityService.createUserQuery().userId(userId).singleResult();
 		if (user != null) {
-			returnUser = new WorkflowUser();
-			returnUser.setId(userId);
-			returnUser.setEmail(user.getEmail());
-			returnUser.setFirstName(user.getFirstName());
-			returnUser.setLastName(user.getLastName());
-			returnUser.setDisplayName(identityService.getUserInfo(userId, WorkflowIdentityService.DISPLAY_NAME_KEY));
+			returnUser = createWorkflowUser(user);
 		}
 
 		return returnUser;
+	}
+
+	/** 
+	 * Utility function to populate a WorkflowUser from User
+	 * @param user
+	 * @return
+	 */
+	private WorkflowUser createWorkflowUser(User user) {
+		WorkflowUser returnUser;
+		returnUser = new WorkflowUser();
+		returnUser.setId(user.getId());
+		returnUser.setEmail(user.getEmail());
+		returnUser.setFirstName(user.getFirstName());
+		returnUser.setLastName(user.getLastName());
+		returnUser.setDisplayName(identityService.getUserInfo(user.getId(), WorkflowIdentityService.DISPLAY_NAME_KEY));
+		returnUser.setGroups(getGroupsForUser(user.getId()));
+		return returnUser;
+	}
+	
+	/**
+	 * Returns a list of all users
+	 * @return
+	 */
+	public List <WorkflowUser> getUsers(){
+		List<WorkflowUser> userList = new ArrayList<WorkflowUser>();
+		
+		List<User> activitiUserList = identityService.createUserQuery().list();
+		for (User user:activitiUserList) {
+			userList.add(createWorkflowUser(user));
+		}
+		
+		return userList;
 	}
 
 	public void addUserInfo(String userId, String infoKey, String infoValue) {
@@ -120,10 +150,38 @@ public class ActivitiIdentityServiceImpl {
 		WorkflowGroup returnGroup = null;
 		Group group = identityService.createGroupQuery().groupId(groupId).singleResult();
 		if (group != null) {
-			returnGroup = new WorkflowGroup();
-			returnGroup.setId(group.getId());
-			returnGroup.setName(group.getName());
+			returnGroup = createWorkflowGroup(group);
 		}
+		return returnGroup;
+	}
+	
+	public List<WorkflowGroup> getGroups(){
+		List<WorkflowGroup> groupList = new ArrayList<WorkflowGroup>();
+		
+		List<Group> activitiGroupList = identityService.createGroupQuery().list();
+		for (Group group:activitiGroupList) {
+			groupList.add(createWorkflowGroup(group));
+		}
+		
+		return groupList;
+	}
+
+	public List<WorkflowGroup> getGroupsForUser(String userId){
+		List<WorkflowGroup> groupList = new ArrayList<WorkflowGroup>();
+		
+		List<Group> activitiGroupList = identityService.createGroupQuery().groupMember(userId).list();
+		for (Group group:activitiGroupList) {
+			groupList.add(createWorkflowGroup(group));
+		}
+		
+		return groupList;
+	}
+
+	private WorkflowGroup createWorkflowGroup(Group group) {
+		WorkflowGroup returnGroup;
+		returnGroup = new WorkflowGroup();
+		returnGroup.setId(group.getId());
+		returnGroup.setName(group.getName());
 		return returnGroup;
 	}
 
