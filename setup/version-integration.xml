@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and Confidential 
+  information of TRGR. Disclosure, Use or Reproduction without the written authorization of TRGR is prohibited. -->
+<project name="ci-version-integration" xmlns:jdg="antlib:com.west.judicial.ant"
+  xmlns:contrib="antlib:net.sf.antcontrib">
+
+  <target name="-initialize-version" depends="-initialize-version-from-label,-initialize-version-from-buildnumber" />
+
+  <target name="-initialize-version-from-label">
+    <contrib:if>
+      <and>
+        <isset property="label" />
+        <not>
+          <contains string="${label}" substring="build." />
+        </not>
+      </and>
+      <contrib:then>
+        <property name="target-version" value="${label}" />
+        <property name="version-already-initialized" value="anything" />
+        <echo message="Set target-revision property to value of label property: ${label}" />
+      </contrib:then>
+      <contrib:else>
+        <contrib:if>
+          <equals arg1="release" arg2="${ivy.settings.environment}" />
+          <contrib:then>
+            <fail>
+If the ivy.settings.environment is release, the only way to establish the version is through the label property.
+            </fail>
+          </contrib:then>
+        </contrib:if>
+      </contrib:else>
+    </contrib:if>
+  </target>
+
+  <target name="-initialize-version-from-buildnumber" depends="-initialize-jdg-tasks" unless="version-already-initialized">
+    <jdg:buildnumber environment="${ivy.settings.environment}"
+      targetRevisionPropertyName="target-version" revision="0.0.0.+" />
+  </target>
+
+  <target name="-initialize-jdg-tasks">
+    <echo message="!!!! Make sure to remove ant-jsch.jar from your Ant installation's lib directory. !!!!" />
+    <taskdef resource="com/west/judicial/ant/antlib.xml" uri="antlib:com.west.judicial.ant"
+      classpathref="ivy-and-peers.lib.path" loaderref="ivy-and-peers.classloader" />
+  </target>
+</project>

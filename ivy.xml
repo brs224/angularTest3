@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <!--
+    * Copyright 2016: Thomson Reuters Global Resources. All Rights Reserved. * Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written *
+    authorization of TRGR is prohibited
+  -->
+
+<ivy-module version="2.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+  <info organisation="com.thomsonreuters.grc" module="grcworkflow" />
+
+  <configurations>
+    <conf name="runtime" description="Modules needed to build the project, except for those that are provided by the container at runtime." />
+    <conf name="compile" extends="runtime" description="Compile-time dependencies. A dependency is needed by the compile conf and not the runtime conf if it is provided by the container at runtime." />
+    <conf name="default" extends="runtime" description="Alias for the runtime conf." />
+    <conf name="test" visibility="private" description="Test dependencies." />
+    
+    <!-- Confs needed for webapps only... -->
+    <conf name="deploy" description="Chain the deployment of webapps." />
+  </configurations>
+  
+  <publications>
+    <!-- If you're not building a war, replace the type and ext values with ones that are appropriate. -->
+    <artifact name="grcworkflow" type="war" ext="war" conf="runtime" />
+  </publications>
+
+  <dependencies defaultconf="runtime->default">
+
+    <!-- Activiti section -->
+    <dependency org="org.activiti" name="activiti-engine" rev="5.+"/>
+    <dependency org="org.activiti" name="activiti-spring" rev="5.+"/>
+
+    <!-- ReST section -->
+    <dependency org="com.sun.jersey" name="jersey-client" rev="1.19.+" />
+    <dependency org="com.sun.jersey" name="jersey-json" rev="1.19.+"  />
+    <dependency org="com.sun.jersey" name="jersey-server" rev="1.19.+"  />
+    <dependency org="com.sun.jersey" name="jersey-servlet" rev="1.19.+"  />
+    <dependency org="com.sun.jersey" name="jersey-core" rev="1.19.+"  />
+    <dependency org="com.sun.jersey.contribs" name="jersey-spring" rev="1.19.+"  />
+    
+    <dependency org="javax.ws.rs" name="jsr311-api" rev="1.+"/>
+
+    <!-- Spring section -->
+    <dependency org="org.springframework" name="spring-web" rev="4.2.0.RELEASE"/>
+    <dependency org="org.springframework" name="spring-context" rev="4.2.0.RELEASE"/>
+    
+    <!-- Database section -->
+    <dependency org="com.oracle" name="ojdbc" rev="11.2.0.3.0"/>
+
+    <!-- Runtime dependencies for Java projects only... -->
+    <dependency org="log4j" name="log4j" rev="1.2.15"  />
+    
+    <!-- Smoke Test section -->
+    <dependency org="com.west.judicial" name="CommonServicesFramework" rev="1.0.0.+" changing="true" />
+
+    <dependency org="commons-io" name="commons-io" rev="2.+"  />
+    <dependency org="commons-collections" name="commons-collections" rev="3.2"  />
+    <dependency org="commons-lang" name="commons-lang" rev="2.5"  />
+
+    <dependency org="javax.servlet" name="servlet-api" rev="2.5" conf="compile->default" />
+
+    <!-- dev server dependencies... -->
+
+    <!-- production dependencies... -->    
+
+    <!-- Test dependencies for Java projects only... -->
+    <dependency org="junit" name="junit" rev="4.7" conf="test->default" />
+
+        <!-- exclude unnecessary jars -->
+        <exclude org="org.springframework" module="spring" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="javax.security" module="jaas" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="org.jboss.vfs" module="com.springsource.org.jboss.virtual" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="org.jboss.util" module="com.springsource.org.jboss.util" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="org.apache.openjpa" module="openjpa" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="com.sun.jdmk" module="jmxtools" /> <!-- ensure the all-in-one spring.jar is not included -->
+        <exclude org="com.sun.jmx" module="jmxri" /> <!-- ensure the all-in-one spring.jar is not included -->
+  </dependencies>
+</ivy-module>

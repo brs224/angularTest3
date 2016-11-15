@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <!--
+    * Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. * Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written *
+    authorization of TRGR is prohibited
+  -->
+<ivysettings>
+  <property name="local.base-path" value="${ivy.default.ivy.user.dir}/local/thomsonreuters" override="false" />
+  <property name="shared-deprecated.base-url" value="http://eg-cttools-b01.tlr.thomson.com:8888/ivy" override="false" />
+  
+  <latest-strategies>
+    <latest-revision name="environment-centric-latest-revision">
+      <specialMeaning name="CI" value="-2" />
+      <specialMeaning name="LOCAL" value="-1" />
+      <specialMeaning name="PRD" value="1" />
+    </latest-revision>
+  </latest-strategies>
+  
+  <resolvers>
+    <filesystem name="local-integration" checkmodified="true" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+
+    <filesystem name="local-thirdparty" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+
+    <url name="shared-integration" checkmodified="true">
+      <ivy pattern="${shared.base-url}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${shared.base-url}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </url>
+
+    <url name="shared-integration-deprecated" checkmodified="true">
+      <ivy pattern="${shared-deprecated.base-url}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${shared-deprecated.base-url}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </url>
+    
+    <url name="shared-thirdparty">
+      <ivy pattern="${shared.base-url}/${thirdparty.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${shared.base-url}/${thirdparty.token}/${ivy.settings.artifact-pattern}" />
+    </url>
+    
+    <filesystem name="scmas-grc-internallibraries">
+      <ivy
+        pattern="//cobaltbuilds.int.westgroup.com/cobaltbuild$/CPP/GRC/InternalLibraries/[organisation]/[module]/Dev/[revision]/ivy.xml" />
+      <artifact
+        pattern="//cobaltbuilds.int.westgroup.com/cobaltbuild$/CPP/GRC/InternalLibraries/[organisation]/[module]/Dev/[revision]/[artifact].[ext]" />
+    </filesystem>
+
+    <filesystem name="scmas-grc-internallibraries-no-org">
+      <ivy
+        pattern="//cobaltbuilds.int.westgroup.com/cobaltbuild$/CPP/GRC/InternalLibraries/[module]/Dev/[revision]/ivy.xml" />
+      <artifact
+        pattern="//cobaltbuilds.int.westgroup.com/cobaltbuild$/CPP/GRC/InternalLibraries/[module]/Dev/[revision]/[artifact].[ext]" />
+    </filesystem>
+
+    <chain name="environment-chain" returnFirst="true">
+      <resolver ref="local-integration" />
+      <resolver ref="local-thirdparty" />
+    </chain>
+  </resolvers>
+</ivysettings>

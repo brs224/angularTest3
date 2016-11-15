@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+  <!--
+    * Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. * Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written *
+    authorization of TRGR is prohibited
+  -->
+<ivysettings>
+  <property name="local.base-path" value="${ivy.default.ivy.user.dir}/local/thomsonreuters" override="false" />
+  <resolvers>
+    <filesystem name="local-integration" checkmodified="true" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${integration.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${integration.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+
+    <filesystem name="local-thirdparty" cache="local-project-cache">
+      <ivy pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.ivy-pattern}" />
+      <artifact pattern="${local.base-path}/${thirdparty.token}/${ivy.settings.artifact-pattern}" />
+    </filesystem>
+    
+    <chain name="environment-chain" returnFirst="true">
+      <resolver ref="local-integration" />
+      <resolver ref="local-thirdparty" />
+    </chain>
+  </resolvers>
+</ivysettings>
