@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+    authorization of TRGR is prohibited.
+
+    Clover configuration - This file contains configuration properties needed
+    for integration of Clover with the build.
+-->
+<project name="clover-build">
+
+    <target name="-load-clover-properties">
+        <property name="clover.jar" value="${basedir}/lib/clover.jar" />
+        <property name="clover.license.path" value="${basedir}/lib/clover.license" />
+        <property name="clover.report.dir" value="${build.dir}/reports/test/java/clover" />
+        <property name="clover.excludes" value="" />
+        <property name="clover.instrumented.src.dir" value="${build.dir}/instrumented/clover/src" />
+        <property name="clover.instrumented.class.dir"
+                  value="${build.dir}/instrumented/clover/classes" />
+        <property name="clover.instrumented.test.dir"
+                  value="${build.dir}/instrumented/clover/test" />
+    </target>
+
+    <target name="-initialize-clover">
+        <taskdef resource="cloverlib.xml" classpath="${clover.jar}" onerror="ignore" />
+
+        <condition property="clover.available">
+            <and>
+                <available classname="com.atlassian.clover.CloverInstr" />
+                <available file="${clover.license.path}" />
+            </and>
+        </condition>
+    </target>
+
+    <target name="-with-clover" depends="initialize,-load-java-build-properties,-load-clover-properties,-initialize-clover" if="clover.available">
+        <property name="clover.instrumented" value="true" />
+        <mkdir dir="${clover.instrumented.src.dir}" />
+        <mkdir dir="${clover.instrumented.test.dir}" />
+        <clover-instr destdir="${clover.instrumented.src.dir}">
+            <fileset dir="${java.src.dir}" includes="**/*.java"/>
+        </clover-instr>
+        <clover-instr destdir="${clover.instrumented.test.dir}">
+            <fileset dir="${java.test.dir}" includes="**/*.java"/>
+        </clover-instr>
+    </target>
+
+    <target name="compile-instrumented-java-source"
+            depends="initialize,-load-clover-properties,-initialize-clover,init-compile-classpath"
+            if="clover.instrumented"
+            description="Compiles instrumented versions of the Java source code">
+        <mkdir dir="${clover.instrumented.class.dir}" />
+        <javac debug="true"
+               srcdir="${clover.instrumented.src.dir}"
+               destdir="${clover.instrumented.class.dir}"
+               source="${javac.source.level}">
+            <classpath refid="java.compile.classpath" />
+        </javac>
+    </target>
+
+    <target name="generate-clover-report"
+            depends="initialize,-load-clover-properties,-initialize-clover,run-java-tests"
+            if="clover.available">
+        <mkdir dir="${clover.report.dir}" />
+        <clover-report>
+            <current outfile="${clover.report.dir}/clover-results.xml">
+                <fileset dir="${java.src.dir}" includes="**/*.java" excludes="${clover.excludes}" />
+                <format type="xml" />
+            </current>
+            <current outfile="${clover.report.dir}">
+                <fileset dir="${java.src.dir}" includes="**/*.java" excludes="${clover.excludes}" />
+                <format type="html" />
+            </current>
+        </clover-report>
+    </target>
+
+    <target name="clean-clover" depends="initialize,-load-clover-properties,-initialize-clover" if="clover.available">
+        <clover-clean />
+    </target>
+</project>

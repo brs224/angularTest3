@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+    authorization of TRGR is prohibited.
+
+    Findbugs configuration - This file contains configuration properties needed
+    for integration of Findbugs with the build.
+-->
+<project name="findbugs-build">
+
+    <target name="-load-findbugs-properties">
+        <property name="findbugs.xsl.file" value="${findbugs.home.dir}/src/xsl/plain.xsl" />
+        <property name="findbugs.report.dir" value="${build.dir}/reports/quality/java/findbugs" />
+        <property name="findbugs.excludes.filter.file"
+                  value="${basedir}/setup/findbugs-default-exclude.xml" />
+    </target>
+
+    <target name="-initialize-findbugs">
+        <taskdef name="findbugs"
+                 classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+                 classpath="${findbugs.home.dir}/lib/findbugs-ant.jar"
+                 onerror="ignore" />
+
+        <available property="findbugs.available" file="${findbugs.home.dir}" type="dir" />
+    </target>
+
+    <target name="generate-findbugs-report"
+            depends="initialize,-load-findbugs-properties,-initialize-findbugs,compile-java-source,init-test-runtime-classpath"
+            if="findbugs.available">
+        <mkdir dir="${findbugs.report.dir}" />
+        <findbugs home="${findbugs.home.dir}"
+                  output="xml:withMessages"
+                  outputFile="${findbugs.report.dir}/findbugs-out.xml"
+                  excludeFilter="${findbugs.excludes.filter.file}"
+                  jvmargs="-Xmx256m">
+            <class location="${java.classes.dir}" />
+            <sourcePath path="${java.src.dir}" />
+            <auxClasspath refid="test.runtime.classpath" />
+        </findbugs>
+        <xslt in="${findbugs.report.dir}/findbugs-out.xml"
+              out="${findbugs.report.dir}/findbugs-out.html"
+              style="${findbugs.xsl.file}" />
+    </target>
+
+</project>

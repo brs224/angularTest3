@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    Copyright 2011: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+    authorization of TRGR is prohibited.
+
+    Web configuration - This file contains configuration properties needed
+    for integration of web application features with the build.
+-->
+<project name="web-build"
+    xmlns:ivy="antlib:org.apache.ivy.ant"
+    xmlns:contrib="antlib:net.sf.antcontrib"
+    xmlns:jdg="antlib:com.west.judicial.ant">
+
+    <target name="-load-web-properties">
+        <property name="war.name" value="${dist.basename}.war" />
+        <property name="web.root" value="${basedir}/web" />
+        <property name="context.dir" value="${basedir}/context" />
+  	 	<property name="lib.dir" value="${basedir}/tools/jdg/lib"/>
+        <property name="yui" value="${basedir}/tools/yuicompressor/yuicompressor-2.4.2.jar"/>
+        <property name="js.build.dir" value="${build.dir}/js"/>
+        <property name="css.build.dir" value="${build.dir}/css"/>
+    </target>
+
+    <target name="-concatenate-js-files">
+        <taskdef name="file-concatenate" classname="com.west.judicial.ant.ConcatenateFiles">
+            <classpath>
+                <fileset dir="${basedir}/tools/jdg/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </taskdef>
+        <mkdir dir="${js.build.dir}"/>
+        <file-concatenate 
+            buildPropertyPath="${basedir}/jSConcatenate.properties" 
+            outputPath="${js.build.dir}/alljsfiles.js"
+            baseDir="${basedir}" />
+    </target>
+
+     <target name="-optimize-js-files" depends="-concatenate-js-files, -load-web-properties">
+        <apply executable="java" parallel="false" verbose="true" dest="${js.build.dir}">
+            <fileset dir="${js.build.dir}" includes="alljsfiles.js"/>
+            <arg line="-jar" />
+            <arg path="${yui}" />
+            <arg value="--charset" />
+            <arg value="UTF-8" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="alljsfiles.js" to="alljsfiles.min.js" />
+        </apply>
+        <delete file="${js.build.dir}/alljsfiles.js"/>
+    </target>
+
+    <target name="-concatenate-css-files" depends="-load-web-properties">
+        <mkdir dir="${css.build.dir}"/>
+        <concat destfile="${css.build.dir}/allhtmlcssfiles.css">
+            <fileset dir="${web.root}/css">
+                <include name="message.css"/>
+                <include name="workbench.css"/>
+                <include name="layout/*"/>
+            	<include name="smoothness/jquery-ui-1.7.1.custom.css"/>
+            </fileset>
+        </concat>
+    </target>
+
+     <target name="-optimize-css-files" depends="-concatenate-css-files, -load-web-properties">
+        <apply executable="java" parallel="false" verbose="true" dest="${css.build.dir}">
+            <fileset dir="${css.build.dir}" includes="allhtmlcssfiles.css"/>
+            <arg line="-jar" />
+            <arg path="${yui}" />
+            <arg value="--charset" />
+            <arg value="UTF-8" />
+            <arg value="-o" />
+            <targetfile />
+            <mapper type="glob" from="allhtmlcssfiles.css" to="allhtmlcssfiles.min.css" />
+        </apply>
+     	<delete file="${css.build.dir}/allhtmlcssfiles.css"/>
+    </target>
+
+
+    <target name="-optimize-web-files"
+            depends="-optimize-css-files, -optimize-js-files"
+            description="Concatenates and compresses web files to optimize browser downloads"/>
+	
+	<target name="dist-local"
+            depends="initialize,-load-web-properties,-as-local,dist"
+            description="Builds local version of web application distributable files" />
+
+    <target name="create-war-local"
+            depends="initialize,-load-web-properties,-as-local,create-war"
+            description="Create a WAR file with the local context.xml moved into META-INF">
+    </target>
+
+    <target name="-ivy-resolve-runtime" depends="initialize">
+        <ivy:resolve file="${ivy.xml.file}"
+                     settingsRef="ivy.instance"
+                     conf="runtime"
+                     resolveId="project.runtime" />
+        <ivy:cachepath pathid="project-ivy.java.runtime.classpath" conf="runtime" type="jar,bundle" />
+        <ivy:cachefileset setid="project-ivy.java.runtime.fileset" conf="runtime" type="jar,bundle" />
+        <echo message="project-ivy.java.runtime.classpath=${toString:project-ivy.java.runtime.classpath}"
+              level="verbose" />
+    </target>
+
+    <target name="deploy-war-local"
+            description="Deploys the WAR file to the local Tomcat Server">
+        <taskdef name="catalina-deploy" classname="org.apache.catalina.ant.DeployTask"/>
+        <catalina-deploy 
+            url="${tomcat-manager-url}"
+            username="${tomcat-manager-username}"
+            password="${tomcat-manager-password}"
+            path="/${dist.basename}"
+            update="true"
+            war="file:${dist.dir}/${war.name}"
+        />
+    </target>
+
+    <target name="create-war"
+            depends="initialize,compile-source,-optimize-web-files,-ivy-resolve-runtime,-load-web-properties"
+            description="Creates a WAR file">
+        <mkdir dir="${dist.dir}" />
+        <war destfile="${dist.dir}/${war.name}"
+             webxml="${web.root}/WEB-INF/web.xml"
+             duplicate="fail">
+            <manifest>
+                <attribute name="Release-Date" value="${iso.8601.timestamp}" />
+                <attribute name="Release-Label" value="${target-version}" />
+                <attribute name="WPT-Version" value="${wpt.version}" />
+            </manifest>
+            <fileset dir="${web.root}">
+                <include name="*" />
+                <include name="css/**" />
+                <include name="images/**" />
+                <include name="js/**" />
+                <include name="app/**" />
+                <include name="pages/**" />
+            </fileset>
+            <fileset dir="${build.dir}">
+                 <include name="css/**" />
+                 <include name="js/**" />
+             </fileset>
+             <fileset dir="${flex.app.dir}" erroronmissingdir="false" />
+        </war>
+        <antcall target="update-war-for-local" />
+    </target>
+
+    <target name="update-war-for-local"
+            depends="initialize,-load-web-properties"
+            if="is.local.build"
+            description="Adds local config file to existing WAR file">
+        <zip destfile="${dist.dir}/${war.name}" update="yes">
+            <zipfileset file="${context.dir}/local_context.xml" fullpath="META-INF/context.xml" />
+        </zip>
+    </target>
+
+    <target name="-as-local">
+        <property name="is.local.build" value="true" />
+    </target>
+
+    <target name="copy-context"
+            depends="initialize,-load-web-properties"
+            description="Copies all *context.xml files to dist folder.">
+        <mkdir dir="${dist.dir}" />
+        <copy overwrite="true" todir="${dist.dir}">
+            <fileset dir="${context.dir}" includes="*context.xml" />
+        </copy>
+    </target>
+
+    <target name="run-in-container-tests"
+            depends="initialize,-load-web-properties,deploy-war"
+            description="Executes automated tests within a web container" />
+
+    <target name="generate-web-test-reports"
+            depends="initialize,-load-web-properties,run-in-container-tests"
+            description="Generates reports for in-container tests of a web application" />
+
+    <target name="-initialize-jsch">
+        <echo message="!!!! Make sure to remove ant-jsch.jar from your Ant installation's lib directory. !!!!" />
+        <taskdef name="scp" 
+                 classname="org.apache.tools.ant.taskdefs.optional.ssh.Scp" 
+                 classpathref="ivy-and-peers.lib.path" loaderRef="ivy-and-peers.classloader" />
+        <taskdef name="sshexec" 
+                 classname="org.apache.tools.ant.taskdefs.optional.ssh.SSHExec"
+                 classpathref="ivy-and-peers.lib.path" loaderRef="ivy-and-peers.classloader" />
+    </target>
+
+    <target name="deploy-war" depends="create-war,-initialize-jsch" description="Deploy to CI server(s)">
+        <scp todir="${deploy.dev.username}@${deploy.dev.server}:/${deploy.nas.container}"
+             password="${deploy.dev.password}"
+             trust="true"
+             sftp="true">
+            <fileset dir="${dist.dir}">
+                <include name="${war.name}" />
+            </fileset>
+        </scp>
+        <scp file="${context.dir}/ci_context.xml"
+             todir="${deploy.dev.username}@${deploy.dev.server}:/${deploy.nas.container}"
+             password="${deploy.dev.password}"
+             trust="true"
+             sftp="true" />
+        <sshexec host="${deploy.dev.server}"
+                 username="${deploy.dev.username}"
+                 password="${deploy.dev.password}"
+                 trust="true"
+                 command="${deploy.container.command}" />
+    </target>
+</project>

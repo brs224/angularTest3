@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+    Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. Proprietary and
+    Confidential information of TRGR. Disclosure, Use or Reproduction without the written
+    authorization of TRGR is prohibited.
+
+    Java configuration - This file contains configuration properties needed
+    for integration of Java with the build.
+-->
+<project name="java-build" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <!-- Three targets that compose classpaths from Ivy dependencies and filesystem paths -->
+    <target name="init-compile-classpath" depends="-ivy-resolve-compile">
+      <path id="java.compile.classpath">
+        <pathelement location="${clover.jar}" />
+        <path refid="project-ivy.java.compile.classpath" />
+      	<pathelement location="${contentSearch.jar}" />
+      	<pathelement location="${berkeleydb.jar}" />
+      </path>
+      <echo message="java.compile.classpath=${toString:java.compile.classpath}" level="verbose" />
+    </target>
+
+    <target name="init-test-compile-classpath" depends="-ivy-resolve-compile,-ivy-resolve-test">
+      <path id="test.compile.classpath">
+        <pathelement location="${java.classes.dir}" />
+        <pathelement location="${clover.jar}" />
+        <path refid="project-ivy.java.compile.classpath" />
+        <path refid="project-ivy.java.test.classpath" />
+      </path>
+      <echo message="test.compile.classpath=${toString:test.compile.classpath}" level="verbose" />
+    </target>
+
+    <target name="init-test-runtime-classpath" depends="-ivy-resolve-compile,-ivy-resolve-test">
+      <path id="test.runtime.classpath">
+        <pathelement location="${junit.dir}" />
+        <pathelement location="${java.test.resource.dir}" />
+        <fileset dir="${groovy.lib.dir}" />
+        <path refid="project-ivy.java.compile.classpath" />
+        <path refid="project-ivy.java.test.classpath" />
+        <pathelement location="${clover.instrumented.class.dir}" />
+        <pathelement location="${java.classes.dir}" />
+        <pathelement location="${java.resource.dir}" />
+        <pathelement location="${clover.jar}" />
+      	<pathelement location="${contentSearch.jar}" />
+      	<pathelement location="${berkeleydb.jar}" />
+      </path>
+      <echo message="test.runtime.classpath=${toString:test.runtime.classpath}" level="verbose" />
+    </target>
+
+    <target name="-ivy-resolve-compile" depends="initialize">
+        <ivy:resolve file="${ivy.xml.file}"
+                     settingsRef="ivy.instance"
+                     conf="compile"
+                     resolveId="project.compile" />
+        <ivy:cachepath pathid="project-ivy.java.compile.classpath" conf="compile" type="jar" />
+        <ivy:cachefileset setid="project-ivy.java.compile.fileset" conf="compile" type="jar" />
+        <echo message="project-ivy.java.compile.classpath=${toString:project-ivy.java.compile.classpath}"
+              level="verbose" />
+    </target>
+
+    <target name="-ivy-resolve-test" depends="initialize">
+        <ivy:resolve file="${ivy.xml.file}"
+                     settingsRef="ivy.instance"
+                     conf="test"
+                     resolveId="project.test" />
+        <ivy:cachepath pathid="project-ivy.java.test.classpath" conf="test" type="jar" />
+        <ivy:cachefileset setid="project-ivy.java.test.fileset" conf="test" type="jar" />
+        <echo message="project-ivy.java.test.classpath=${toString:project-ivy.java.test.classpath}"
+              level="verbose" />
+    </target>
+
+    <!-- Java/Groovy compilation and testing targets -->
+    <target name="-load-java-build-properties">
+        <property name="javac.source.level" value="1.8" />
+        <property name="java.src.dir" value="${basedir}/src/java" />
+        <property name="java.classes.dir" value="${build.dir}/classes" />
+        <property name="java.test.dir" value="${basedir}/test/java" />
+        <property name="junit.dir" value="${build.dir}/test/junit" />
+        <property name="junit.report.dir" value="${build.dir}/reports/test/java/results" />
+        <property name="java.resource.dir" value="${basedir}/resources/java" />
+        <property name="java.test.resource.dir" value="${basedir}/test-resources/java" />
+        <property name="groovy.lib.dir" value="${basedir}/tools/groovy/lib" />
+        <property name="groovy.test.dir" value="${basedir}/test/groovy" />
+    	<property name="contentSearch.jar" value="${basedir}/lib/ContentSearchObjects-27.2.17.jar" />
+    	<property name="berkeleydb.jar" value="${basedir}/lib/db-5.1.19.jar" />
+    </target>
+
+    <target name="compile-java-source"
+            depends="initialize,-load-java-build-properties,init-compile-classpath,compile-instrumented-java-source"
+            description="Compiles Java source code">
+        <mkdir dir="${java.classes.dir}" />
+        <javac debug="true"
+               srcdir="${java.src.dir}"
+               destdir="${java.classes.dir}"
+               source="${javac.source.level}">
+            <classpath refid="java.compile.classpath" />
+        </javac>
+    </target>
+
+    <target name="compile-java-tests"
+            depends="compile-java-source,init-test-compile-classpath"
+            description="Compiles Java test code">
+        <mkdir dir="${junit.dir}" />
+        <condition property="javac.srcdir.test"
+                   value="${clover.instrumented.test.dir}"
+                   else="${java.test.dir}">
+            <istrue value="${clover.instrumented}" />
+        </condition>
+        <javac debug="true"
+               srcdir="${javac.srcdir.test}"
+               destdir="${junit.dir}"
+               source="${javac.source.level}">
+            <classpath refid="test.compile.classpath" />
+        </javac>
+    </target>
+
+    <target name="run-java-tests"
+            depends="initialize,-with-clover,compile-java-tests,compile-groovy-tests,init-test-runtime-classpath"
+            description="Runs Java tests for project">
+        <mkdir dir="${test.result.dir}" />
+        <junit fork="yes" forkmode="once" failureproperty="junit.failed" dir="${basedir}">
+            <classpath refid="test.runtime.classpath" />
+            <formatter type="brief" usefile="true" />
+            <formatter type="xml" />
+            <batchtest todir="${test.result.dir}">
+                <fileset dir="${junit.dir}" erroronmissingdir="false">
+                    <include name="**/*Test.class" />
+                </fileset>
+            </batchtest>
+            <jvmarg value="-Xms256M" />
+            <jvmarg value="-Xmx1024M" />
+            <jvmarg value="-ea" />
+        </junit>
+        <fail message="JUnit test(s) failed">
+            <condition>
+                <and>
+                    <istrue value="${fail-on-test-failure}" />
+                    <isset property="junit.failed" />
+                </and>
+            </condition>
+        </fail>
+    </target>
+
+    <target name="-initialize-groovy" depends="initialize,-load-java-build-properties">
+        <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+            <classpath>
+                <fileset dir="${groovy.lib.dir}">
+                    <include name="**/*.jar" />
+                    <include name="**/*.zip" />
+                </fileset>
+            </classpath>
+        </taskdef>
+    </target>
+
+    <target name="compile-groovy-tests"
+            description="Compiles the Groovy source code and outputs to the test directory"
+            depends="-initialize-groovy,compile-java-tests">
+        <mkdir dir="${junit.dir}" />
+        <groovyc srcdir="${groovy.test.dir}" destdir="${junit.dir}">
+            <classpath path="${junit.dir}" />
+            <classpath refid="test.compile.classpath" />
+        </groovyc>
+    </target>
+
+    <target name="generate-java-test-reports"
+            depends="initialize, generate-junit-report, generate-clover-report" />
+
+    <target name="generate-junit-report" depends="initialize, run-java-tests">
+        <mkdir dir="${junit.report.dir}" />
+        <junitreport todir="${junit.report.dir}">
+            <fileset dir="${test.result.dir}" includes="**/TEST-*.xml" />
+            <report todir="${junit.report.dir}" />
+        </junitreport>
+    </target>
+
+    <target name="generate-java-quality-reports" depends="initialize, generate-findbugs-report" />
+
+</project>

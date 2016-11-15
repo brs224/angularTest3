@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved.
+Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproduction without the written authorization of TRGR is prohibited
+-->
+<dataset>
+	<EXAMPLE_TYPE
+        EXAMPLE_TYPE_CODE="0"
+        EXAMPLE_TYPE_DESC="XML Loaded Example Type 0"/>
+	<EXAMPLE_TYPE
+        EXAMPLE_TYPE_CODE="1"
+        EXAMPLE_TYPE_DESC="XML Loaded Example Type 1"/>
+</dataset>
