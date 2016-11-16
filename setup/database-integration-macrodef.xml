@@ -7,7 +7,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
  	Database macro definitions  
  -->
 <project name="database macro definitions" basedir="." xmlns:contrib="antlib:net.sf.antcontrib">
-	
+
 	<macrodef name="run-sql-macro">
 		<attribute name="sqlfile"/>
 		<attribute name="url"/>
@@ -30,37 +30,37 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				<classpath>
 					<fileset dir="${jdbc.path}" includes="*.jar"/>
 				</classpath>
-			</sql>	
+			</sql>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="create-db-users-macro"
             description="Execute DDL to create all users for schema">
 		<sequential>
-            <run-sql-macro 
+			<run-sql-macro 
                 url="${url}" 
                 userid="${dba.user}" 
                 password="${dba.password}" 
                 sqlfile="${ddl.path}/config/create users.sql" 
                 output="${tmp.dir}/create users results.sql"/>
-            <echo level="info">FINISHED CREATING USERS.</echo>	
+			<echo level="info">FINISHED CREATING USERS.</echo>
 
 		</sequential>
 	</macrodef>
-        
-    <macrodef name="drop-db-users-macro">
+
+	<macrodef name="drop-db-users-macro">
 		<sequential>
-            <run-sql-macro 
+			<run-sql-macro 
                 url="${url}" 
                 userid="${dba.user}" 
                 password="${dba.password}" 
                 sqlfile="${ddl.path}/config/drop users.sql" 
                 output="${tmp.dir}/drop users results.sql"/>
-            <echo level="info">FINISHED DROPPING USERS.</echo>	
+			<echo level="info">FINISHED DROPPING USERS.</echo>
 
 		</sequential>
 	</macrodef>
-		
+
 	<macrodef name="drop-tables-macro">
 		<attribute name="user"/>
 		<sequential>
@@ -79,14 +79,14 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				output="${tmp.dir}/@{user}/drop tables results.sql"/>
 		</sequential>
 	</macrodef>
-    
+
 	<macrodef name="drop-tables-and-synonyms-macro">
 		<attribute name="partition"/>
 		<sequential>
 			<drop-tables user="@{partition}${partition.suffix}"/>
 			<drop-synonyms user="@{partition}${partition.suffix}"/>
 		</sequential>
-	</macrodef>    
+	</macrodef>
 
 	<macrodef name="create-tables-macro"
 		description="Execute DDL to create all tables in the specified schema">
@@ -102,7 +102,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						password="@{user}" 
 						sqlfile="${ddl.path}/schema-specific/@{partition}/create tables.sql" 
 						output="${tmp.dir}/@{user}/create tables results.sql"/>
-                    <echo level="info">FINISHED CREATING TABLES FOR @{user}.</echo>	
+					<echo level="info">FINISHED CREATING TABLES FOR @{user}.</echo>
 				</contrib:try>
 				<contrib:catch>
 					<run-sql-macro 
@@ -110,32 +110,32 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						userid="@{user}" 
 						password="@{user}" 
 						sqlfile="${ddl.path}/common/create tables.sql" 
-						output="${tmp.dir}/@{user}/create tables results.sql"/>                   
-                    <echo level="info">FINISHED CREATING TABLES FOR @{user}.</echo>	
+						output="${tmp.dir}/@{user}/create tables results.sql"/>
+					<echo level="info">FINISHED CREATING TABLES FOR @{user}.</echo>
 				</contrib:catch>
 			</contrib:trycatch>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="enable-constraints-macro"
 		description="Execute DDL to create the disable constraints script">
-		<attribute name="user"/>		
+		<attribute name="user"/>
 		<sequential>
 			<mkdir dir="${tmp.dir}/@{user}"/>
 			<echo level="info" file="${tmp.dir}/@{user}/build enable constraints script.sql">select 'ALTER TABLE '||TABLE_NAME||' ENABLE CONSTRAINT '||CONSTRAINT_NAME||';' FROM USER_CONSTRAINTS WHERE TABLE_NAME IN (SELECT TABLE_NAME FROM USER_TABLES) ORDER BY CONSTRAINT_TYPE;</echo>
-			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build enable constraints script.sql" output="${tmp.dir}/@{user}/enable constraints.sql"/>		
+			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build enable constraints script.sql" output="${tmp.dir}/@{user}/enable constraints.sql"/>
 			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/enable constraints.sql" output="${tmp.dir}/@{user}/enable constraints results.sql"/>
 		</sequential>
-	</macrodef>	
-	
+	</macrodef>
+
 	<macrodef name="disable-constraints-macro">
 		<attribute name="user"/>
 		<sequential>
 			<mkdir dir="${tmp.dir}/@{user}"/>
 			<echo level="info" file="${tmp.dir}/@{user}/build disable constraints script.sql">select 'ALTER TABLE '||TABLE_NAME||' DISABLE CONSTRAINT '||CONSTRAINT_NAME||' CASCADE;' FROM USER_CONSTRAINTS;</echo>
-			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build disable constraints script.sql" output="${tmp.dir}/@{user}/disable constraints.sql"/>		
+			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build disable constraints script.sql" output="${tmp.dir}/@{user}/disable constraints.sql"/>
 			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/disable constraints.sql" output="${tmp.dir}/@{user}/disable constraints results.sql"/>
-		</sequential>	
+		</sequential>
 	</macrodef>
 
 	<macrodef name="create-grants-macro"
@@ -146,20 +146,20 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<mkdir dir="${tmp.dir}/@{user}"/>
 			<echo level="info" file="${tmp.dir}/@{user}/build create grants.sql">select 'GRANT DELETE, INSERT, SELECT, UPDATE ON '||table_name||' TO @{user}_ROLE'||';' from user_tables;${line.separator}</echo>
 			<echo level="info" file="${tmp.dir}/@{user}/build create grants.sql" append="true">select 'GRANT SELECT ON '||sequence_name||' TO @{user}_ROLE'||';' from user_sequences;</echo>
-			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build create grants.sql" output="${tmp.dir}/@{user}/create grants.sql"/>		
-			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/create grants.sql" output="${tmp.dir}/@{user}/create grants results.sql"/>	
-		</sequential>	
+			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/build create grants.sql" output="${tmp.dir}/@{user}/create grants.sql"/>
+			<run-sql-macro url="${url}" userid="@{user}" password="@{user}" sqlfile="${tmp.dir}/@{user}/create grants.sql" output="${tmp.dir}/@{user}/create grants results.sql"/>
+		</sequential>
 	</macrodef>
 
 	<macrodef name="drop-synonyms-macro" description="Execute DDL to drop synonyms">
 		<attribute name="user"/>
 		<sequential>
 			<mkdir dir="${tmp.dir}/@{user}"/>
-			<run-sql-macro url="${url}" userid="@{user}_user" password="@{user}_user" sqlfile="${ddl.path}/common/build drop synonyms script.sql" output="${tmp.dir}/@{user}/drop synonyms.sql"/>		
-			<run-sql-macro url="${url}" userid="@{user}_user" password="@{user}_user" sqlfile="${tmp.dir}/@{user}/drop synonyms.sql" output="${tmp.dir}/@{user}/drop synonyms results.sql"/>			
-		</sequential>	
+			<run-sql-macro url="${url}" userid="@{user}_user" password="@{user}_user" sqlfile="${ddl.path}/common/build drop synonyms script.sql" output="${tmp.dir}/@{user}/drop synonyms.sql"/>
+			<run-sql-macro url="${url}" userid="@{user}_user" password="@{user}_user" sqlfile="${tmp.dir}/@{user}/drop synonyms.sql" output="${tmp.dir}/@{user}/drop synonyms results.sql"/>
+		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="create-synonyms-macro" description="Execute DDL to create synonyms">
 		<attribute name="partition"/>
 		<attribute name="user"/>
@@ -171,7 +171,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<run-sql-macro url="${url}" userid="@{user}_user" password="@{user}_user" sqlfile="${tmp.dir}/@{user}/build synonyms.sql" output="${tmp.dir}/@{user}/build synonyms results.sql"/>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="create-database-macro">
 		<attribute name="partition"/>
 		<sequential>
@@ -179,10 +179,10 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<drop-tables-macro user="@{partition}${partition.suffix}"/>
 			<drop-synonyms-macro user="@{partition}${partition.suffix}"/>
 			<create-tables-macro user="@{partition}${partition.suffix}" partition="@{partition}"/>
-			<create-grants-macro user="@{partition}${partition.suffix}" partition="@{partition}"/>				
+			<create-grants-macro user="@{partition}${partition.suffix}" partition="@{partition}"/>
 			<create-synonyms-macro user="@{partition}${partition.suffix}" partition="@{partition}"/>
 			<enable-constraints-macro user="@{partition}${partition.suffix}"/>
-		</sequential>	
+		</sequential>
 	</macrodef>
-	
+
 </project>

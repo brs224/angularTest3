@@ -25,14 +25,14 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				url="@{url}"
 				userid="@{userid}"
 				password="@{password}">
-				<export	dest="@{output}" format="@{format}">					
+				<export	dest="@{output}" format="@{format}">
 					<query name="@{queryname}" sql="@{sql}"/>
 				</export>
 
 			</dbunit>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="run-dbunit-load-macro">
 		<attribute name="filename"/>
 		<attribute name="userid"/>
@@ -57,7 +57,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			</dbunit>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="truncate-tables-macro"
 		description="Execute truncate command on all tables in a schema">
 		<attribute name="user"/>
@@ -69,7 +69,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				userid="@{user}_user" 
 				password="@{user}_user" 
 				sqlfile="${tmp.dir}/@{user}/build truncate script.sql" 
-				output="${tmp.dir}/@{user}/truncate tables.sql"/>		
+				output="${tmp.dir}/@{user}/truncate tables.sql"/>
 			<run-sql-macro 
 				url="${url}" 
 				userid="@{user}_user" 
@@ -78,7 +78,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				output="${tmp.dir}/@{user}/truncate tables results.sql"/>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="extract-macro">
 		<attribute name="partition"/>
 		<attribute name="url"/>
@@ -101,7 +101,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						<chainedmapper>
 							<flattenmapper/>
 							<globmapper from="*.sql" to=""/>
-						</chainedmapper>			
+						</chainedmapper>
 					</pathconvert>
 					<contrib:trycatch>
 						<contrib:try>
@@ -110,7 +110,8 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						<contrib:catch>
 							<loadfile property="@{partition}.input" srcFile="${extract.path}/schema-specific/@{partition}/input/input.txt"/>
 						</contrib:catch>
-					    <contrib:finally></contrib:finally>
+						<contrib:finally>
+						</contrib:finally>
 					</contrib:trycatch>
 					<for param="file" list="${@{partition}.filelist}" delimiter=';'>
 						<sequential>
@@ -124,9 +125,9 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 										<filterchain>
 											<replacetokens>
 												<token key="INPUT" value="${@{partition}.input}"/>
-											</replacetokens>								
+											</replacetokens>
 										</filterchain>
-									</copy>						
+									</copy>
 								</contrib:try>
 								<contrib:catch>
 									<copy
@@ -136,12 +137,12 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 										<filterchain>
 											<replacetokens>
 												<token key="INPUT" value="${@{partition}.input}"/>
-											</replacetokens>								
+											</replacetokens>
 										</filterchain>
 									</copy>
 								</contrib:catch>
 								<contrib:finally>
-									<loadfile property="@{partition}.@{file}.sql" srcFile="@{output}/@{partition}/sql/@{file}.sql"/>			
+									<loadfile property="@{partition}.@{file}.sql" srcFile="@{output}/@{partition}/sql/@{file}.sql"/>
 									<run-dbunit-export-macro
 										output="@{output}/@{partition}/OUTPUT/@{file}.xml"
 										sql="${@{partition}.@{file}.sql}"
@@ -157,8 +158,8 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 					</for>
 				</contrib:then>
 			</contrib:if>
-		</sequential>	
-	</macrodef>	
+		</sequential>
+	</macrodef>
 
 	<macrodef name="load-extracted-data-macro">
 		<attribute name="partition"/>
@@ -173,7 +174,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						<include name="**/*.xml"/>
 						<exclude name="LONG_TITLE_CLOB/*"/>
 					</fileset>
-				</path>	
+				</path>
 			</pathconvert>
 			<for param="file" list="${@{partition}.load.filelist}" delimiter=';'>
 				<sequential>
@@ -185,10 +186,10 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						format="flat"
 					/>
 				</sequential>
-			</for>		
-		</sequential>	
+			</for>
+		</sequential>
 	</macrodef>
-		
+
 	<macrodef name="load-xml-data-macro">
 		<attribute name="partition"/>
 		<attribute name="user"/>
@@ -198,7 +199,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 					<fileset dir="${load.path}/@{partition}">
 						<include name="**/*.xml"/>
 					</fileset>
-				</path>	
+				</path>
 			</pathconvert>
 			<for param="file" list="${@{partition}.load.xml.filelist}" delimiter=';'>
 				<sequential>
@@ -210,10 +211,10 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						format="flat"
 					/>
 				</sequential>
-			</for>			
+			</for>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="load-xls-data-macro">
 		<attribute name="partition"/>
 		<attribute name="user"/>
@@ -225,7 +226,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 							<fileset dir="${load.path}/default">
 								<include name="**/*.xls"/>
 							</fileset>
-						</path>	
+						</path>
 					</pathconvert>
 					<for param="file" list="${default.xls.filelist}" delimiter=';'>
 						<sequential>
@@ -235,7 +236,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 								password="@{user}" 
 								format="xls"/>
 						</sequential>
-					</for>			
+					</for>
 				</contrib:try>
 				<contrib:catch>
 					<pathconvert property="@{partition}.xls.filelist" targetos="windows">
@@ -243,7 +244,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 							<fileset dir="${load.path}/@{partition}">
 								<include name="**/*.xls"/>
 							</fileset>
-						</path>	
+						</path>
 					</pathconvert>
 					<for param="file" list="${@{partition}.xls.filelist}" delimiter=';'>
 						<sequential>
@@ -259,9 +260,9 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				<contrib:finally>
 				</contrib:finally>
 			</contrib:trycatch>
-		</sequential>					
+		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="load-csv-data-macro">
 		<attribute name="partition"/>
 		<attribute name="user"/>
@@ -273,7 +274,7 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				format="csv"/>
 		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="extract-data-macro">
 		<attribute name="partition"/>
 		<sequential>
@@ -294,9 +295,9 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 						url="${machv.url}"/>
 				</contrib:else>
 			</contrib:if>
-		</sequential>		
+		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="load-lookup-data-macro">
 		<attribute name="partition"/>
 		<sequential>
@@ -304,10 +305,10 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<disable-constraints-macro user="@{partition}${partition.suffix}"/>
 			<load-xls-data-macro 
 				partition="@{partition}" 
-				user="@{partition}${partition.suffix}_user"/>	
+				user="@{partition}${partition.suffix}_user"/>
 			<enable-constraints-macro user="@{partition}${partition.suffix}_user"/>
 		</sequential>
-	</macrodef>	
+	</macrodef>
 
 	<macrodef name="load-data-macro">
 		<attribute name="partition"/>
@@ -322,18 +323,18 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 				user="@{partition}${partition.suffix}_user"/>
 			<load-xml-data-macro 
 				partition="@{partition}" 
-				user="@{partition}${partition.suffix}_user"/>			
+				user="@{partition}${partition.suffix}_user"/>
 			<enable-constraints-macro user="@{partition}${partition.suffix}_user"/>
-		</sequential>	
+		</sequential>
 	</macrodef>
-	
+
 	<macrodef name="disable-constraints-and-truncate-tables-macro">
 		<attribute name="partition"/>
 		<sequential>
 			<echo level="info">Truncating Tables in:  @{partition}${partition.suffix}</echo>
 			<disable-constraints-macro user="@{partition}${partition.suffix}"/>
 			<truncate-tables-macro user="@{partition}${partition.suffix}"/>
-		</sequential>		
+		</sequential>
 	</macrodef>
 
 </project>
