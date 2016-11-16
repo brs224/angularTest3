@@ -12,22 +12,22 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 
 <project name="database etl build" basedir=".">
 
-    <!--
+	<!--
         Global properties, task definitions, and imports
     -->
-    <import file="${basedir}/setup/database-custom-etl-macrodef.xml"
+	<import file="${basedir}/setup/database-custom-etl-macrodef.xml"
             description="Loads the database macro definitions" />
 
-    <target name="extract-data"
+	<target name="extract-data"
             depends="initialize-database-scripts"
             description="Run SQL to extract data from MachV or JRECS and create load files">
 
-        <for list="${partition.list}" param="partition">
-            <sequential>
-                <extract-data-macro partition="@{partition}" />
-            </sequential>
-        </for>
-        <!--
+		<for list="${partition.list}" param="partition">
+			<sequential>
+				<extract-data-macro partition="@{partition}" />
+			</sequential>
+		</for>
+		<!--
 		<parallel threadCount="4">
 			<extract-data-macro partition="admindec_md"/>
 			<extract-data-macro partition="case_md"/>
@@ -35,23 +35,23 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<extract-data-macro partition="litigator_md"/>
 		</parallel>
 		-->
-    </target>
+	</target>
 
-    <target name="create-and-load-database"
+	<target name="create-and-load-database"
             depends="create-database,extract-data,load-data"
             description="Creates database tables and loads data">
-    </target>
+	</target>
 
-    <target name="load-lookup-data"
+	<target name="load-lookup-data"
             depends="truncate-tables"
             description="Target for loading lookup data to the database(s)">
 
-        <for list="${partition.list}" param="partition">
-            <sequential>
-                <load-lookup-data-macro partition="@{partition}" />
-            </sequential>
-        </for>
-        <!--
+		<for list="${partition.list}" param="partition">
+			<sequential>
+				<load-lookup-data-macro partition="@{partition}" />
+			</sequential>
+		</for>
+		<!--
 		<parallel threadCount="4">
 			<load-lookup-data-macro partition="admindec_md"/>
 			<load-lookup-data-macro partition="case_md"/>
@@ -59,19 +59,19 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<load-lookup-data-macro partition="litigator_md"/>						
 		</parallel>
 		-->
-    </target>
+	</target>
 
-    <target name="load-data"
+	<target name="load-data"
             depends="truncate-tables, extract-data"
             description="Target for loading data to the database(s)">
 
-        <for list="${partition.list}" param="partition">
-            <sequential>
-                <load-data-macro partition="@{partition}" />
-                <!--<load-lookup-data-macro partition="@{partition}"/>-->
-            </sequential>
-        </for>
-        <!--
+		<for list="${partition.list}" param="partition">
+			<sequential>
+				<load-data-macro partition="@{partition}" />
+				<!--<load-lookup-data-macro partition="@{partition}"/>-->
+			</sequential>
+		</for>
+		<!--
 		<parallel threadCount="4">		
 			<load-data-macro partition="admindec_md"/>
 			<load-data-macro partition="case_md"/>
@@ -79,21 +79,21 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
 			<load-data-macro partition="litigator_md"/>	
 		</parallel>
 -->
-    </target>
+	</target>
 
-    <target name="truncate-tables"
+	<target name="truncate-tables"
             depends="initialize-database-scripts"
             description="Target for truncating data in the database(s)">
 
-        <for list="${partition.list}" param="partition">
-            <sequential>
-                <echo level="info">Truncating Tables in:  @{partition}${partition.suffix}</echo>
-                <disable-constraints-macro user="@{partition}${partition.suffix}" />
-                <truncate-tables-macro user="@{partition}${partition.suffix}" />
-            </sequential>
-        </for>
+		<for list="${partition.list}" param="partition">
+			<sequential>
+				<echo level="info">Truncating Tables in:  @{partition}${partition.suffix}</echo>
+				<disable-constraints-macro user="@{partition}${partition.suffix}" />
+				<truncate-tables-macro user="@{partition}${partition.suffix}" />
+			</sequential>
+		</for>
 
-        <!--
+		<!--
 		<parallel threadCount="4">
 			<disable-constraints-and-truncate-tables-macro 
                 partition="admindec_md"/>
@@ -105,5 +105,5 @@ Proprietary and Confidential information of TRGR.  Disclosure, Use or Reproducti
                 partition="litigator_md"/>
 		</parallel>
 		-->
-    </target>
+	</target>
 </project>

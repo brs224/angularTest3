@@ -10,38 +10,38 @@
 -->
 <project name="java-service-build">
 
-    <target name="update-war-for-java-service"
+	<target name="update-war-for-java-service"
             depends="initialize, create-war"
             description="Applies Java service files to existing war">
-        <copy todir="${build.dir}/runtime/lib/" flatten="true">
-            <fileset refid="project-ivy.java.runtime.fileset" />
-        </copy>
-        <condition property="war.classes.dir"
+		<copy todir="${build.dir}/runtime/lib/" flatten="true">
+			<fileset refid="project-ivy.java.runtime.fileset" />
+		</copy>
+		<condition property="war.classes.dir"
                    value="${clover.instrumented.class.dir}"
                    else="${java.classes.dir}">
-            <istrue value="${clover.instrumented}" />
-        </condition>
-        <war destfile="${dist.dir}/${war.name}" update="true" duplicate="fail">
-            <lib dir="${build.dir}/runtime/lib/" />
-        	<lib file="${contentSearch.jar}" />
-        	<lib file="${berkeleydb.jar}" />
-            <lib file="${berkeleylib1.dll}" />
-        	<lib file="${berkeleylib2.dll}" />
-            <lib file="${berkeleylib1.so}" />
-        	<lib file="${berkeleylib2.so}" />
-            <classes dir="${war.classes.dir}" />
-            <classes dir="${java.resource.dir}" />
-        </war>
-    </target>
+			<istrue value="${clover.instrumented}" />
+		</condition>
+		<war destfile="${dist.dir}/${war.name}" update="true" duplicate="fail">
+			<lib dir="${build.dir}/runtime/lib/" />
+			<lib file="${contentSearch.jar}" />
+			<lib file="${berkeleydb.jar}" />
+			<lib file="${berkeleylib1.dll}" />
+			<lib file="${berkeleylib2.dll}" />
+			<lib file="${berkeleylib1.so}" />
+			<lib file="${berkeleylib2.so}" />
+			<classes dir="${war.classes.dir}" />
+			<classes dir="${java.resource.dir}" />
+		</war>
+	</target>
 
-    <target name="update-war-for-clover"
+	<target name="update-war-for-clover"
             if="clover.instrumented"
             depends="initialize, create-war"
             description="Applies Clover files to existing war">
-        <war destfile="${dist.dir}/${war.name}" update="true" duplicate="fail">
-            <lib file="${clover.jar}" />
-            <classes file="${clover.license.path}" />
-        </war>
-    </target>
+		<war destfile="${dist.dir}/${war.name}" update="true" duplicate="fail">
+			<lib file="${clover.jar}" />
+			<classes file="${clover.license.path}" />
+		</war>
+	</target>
 
 </project>

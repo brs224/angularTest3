@@ -1,12 +1,9 @@
-<!--
-	Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved.
-	Proprietary and Confidential information of TRGR. Disclosure, Use or Reproduction without the written authorization of TRGR is prohibited
- -->
+<!-- Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved. 
+	Proprietary and Confidential information of TRGR. Disclosure, Use or Reproduction 
+	without the written authorization of TRGR is prohibited -->
 
 <Context swallowOutput="true">
-    <Environment name="application.properties.location" 
-     value="classpath:environment/local.application.properties"
-     type="java.lang.String" 
-     override="false" />
+	<Environment name="application.properties.location"
+		value="classpath:environment/local.application.properties" type="java.lang.String"
+		override="false" />
 </Context>
-
