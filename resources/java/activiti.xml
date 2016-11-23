@@ -43,7 +43,6 @@
 
 	<bean id="workflowDAO"
 		class="com.thomsonreuters.grc.workflow.dao.impl.WorkflowDAOImpl">
-		<property name="grcActivitiDataSource" ref="grcActivitiDataSource" />
 	</bean>
 
 	<bean id="workflowTaskService"
