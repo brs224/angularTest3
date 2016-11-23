@@ -28,8 +28,8 @@
   <dependencies defaultconf="runtime->default">
 
     <!-- Activiti section -->
-    <dependency org="org.activiti" name="activiti-engine" rev="5.+"/>
-    <dependency org="org.activiti" name="activiti-spring" rev="5.+"/>
+    <dependency org="org.activiti" name="activiti-engine" rev="5.22.0"/>
+    <dependency org="org.activiti" name="activiti-spring" rev="5.22.0"/>
 
     <!-- ReST section -->
     <dependency org="com.sun.jersey" name="jersey-client" rev="1.19.+" />
