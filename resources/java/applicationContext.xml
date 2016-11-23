@@ -59,8 +59,4 @@
         for anything with annotations - and then process/instantiate those annotations appropriately. -->
     <context:component-scan base-package="com.thomsonreuters.grc" />
 
-        <bean id="securityService" class="com.thomsonreuters.grc.service.security.impl.SecurityServiceWebImpl">
-            <property name="securityServiceUrl" value="${securityService.url}"/>
-        </bean>
-
 </beans>

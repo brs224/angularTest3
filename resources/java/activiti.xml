@@ -46,7 +46,7 @@
 	</bean>
 
 	<bean id="workflowTaskService"
-		class="com.thomsonreuters.grc.workflow.service.impl.WorkflowTaskServiceImpl">
+		class="com.thomsonreuters.grc.workflow.bpm.service.impl.WorkflowTaskServiceImpl">
 	</bean>
 
 	<bean id="grcWorkflowResource"
