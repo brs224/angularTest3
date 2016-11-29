@@ -63,7 +63,7 @@
 
 	<target name="run-ci-loop" depends="initialize,tfsget,clean,initialize-ci-build,create-ci-artifacts,generate-reports,ivy-publish" description="Runs the continuous integration loop" />
 
-	<target name="dist" depends="initialize,ivy-deliver, create-war, copy-context, update-war-for-java-service, create-jar" description="Builds all distributable artifacts for the project" />
+	<target name="dist" depends="initialize,ivy-deliver, npm-build, create-war, copy-context, update-war-for-java-service, create-jar" description="Builds all distributable artifacts for the project" />
 
 	<target name="create-ci-artifacts" depends="initialize,ivy-deliver, create-war, copy-context, update-war-for-java-service, update-war-for-clover, create-jar" description="Creates artifacts necessary for continuous integration" />
 
@@ -85,5 +85,40 @@
 		<property name="fail-on-test-failure" value="true" />
 		<property name="ci.build" value="true" />
 	</target>
+	
+	<!--
+	    <property name="npm.build.path" value="C:\Program Files\nodejs\npm.cmd" />
+	
+	
+		<macrodef name="NpmBuild">
+
+			
+		    <sequential>
+
+		    	<echo>In Macro DEf NPM BUILD !!!</echo>
+		   
+		        <echo message="Calling NPM INSTALL" />
+		          <exec dir="." executable="${npm.build.path}">
+		    		 <arg value="install"/>
+		    	 </exec>
+  
+				 <echo message="Calling NPM BUILD" />
+		    	   <exec dir="." executable="${npm.build.path}">
+		    		   <arg value="run"/>
+		    	       <arg value="build"/>
+		    	</exec>
+
+		    
+				 
+		    </sequential>
+
+		</macrodef>
+
+
+		      <NpmBuild>      
+		      </NpmBuild>
+	
+	-->
+		
 
 </project>

@@ -20,9 +20,14 @@
 		<property name="lib.dir" value="${basedir}/tools/jdg/lib"/>
 		<property name="yui" value="${basedir}/tools/yuicompressor/yuicompressor-2.4.2.jar"/>
 		<property name="js.build.dir" value="${build.dir}/js"/>
-		<property name="css.build.dir" value="${build.dir}/css"/>
+		<property name="css.build.dir" value="${build.dir}/css"/> 
 	</target>
 
+	<target name="-webpack-files">
+	
+	</target>
+		
+   <!--
 	<target name="-concatenate-js-files">
 		<taskdef name="file-concatenate" classname="com.west.judicial.ant.ConcatenateFiles">
 			<classpath>
@@ -31,19 +36,21 @@
 				</fileset>
 			</classpath>
 		</taskdef>
-		<mkdir dir="${js.build.dir}"/>
+		
+	<mkdir dir="${js.build.dir}"/>
 		<file-concatenate 
             buildPropertyPath="${basedir}/jSConcatenate.properties" 
             outputPath="${js.build.dir}/alljsfiles.js"
             baseDir="${basedir}" />
 	</target>
+	
 
 	<target name="-optimize-js-files" depends="-concatenate-js-files, -load-web-properties">
 		<apply executable="java" parallel="false" verbose="true" dest="${js.build.dir}">
 			<fileset dir="${js.build.dir}" includes="alljsfiles.js"/>
 			<arg line="-jar" />
 			<arg path="${yui}" />
-			<arg value="--charset" />
+			<arg value="-charset" />
 			<arg value="UTF-8" />
 			<arg value="-o" />
 			<targetfile />
@@ -69,7 +76,7 @@
 			<fileset dir="${css.build.dir}" includes="allhtmlcssfiles.css"/>
 			<arg line="-jar" />
 			<arg path="${yui}" />
-			<arg value="--charset" />
+			<arg value="-charset" />
 			<arg value="UTF-8" />
 			<arg value="-o" />
 			<targetfile />
@@ -82,7 +89,8 @@
 	<target name="-optimize-web-files"
             depends="-optimize-css-files, -optimize-js-files"
             description="Concatenates and compresses web files to optimize browser downloads"/>
-
+-->
+	
 	<target name="dist-local"
             depends="initialize,-load-web-properties,-as-local,dist"
             description="Builds local version of web application distributable files" />
@@ -116,10 +124,29 @@
         />
 	</target>
 
+	<target name = "npm-build">
+		 <property name="npm.build.path" value="C:\Program Files\nodejs\npm.cmd" />
+			
+		 <echo message="Calling NPM INSTALL to create/update node_modules" />
+		  <exec dir="." executable="${npm.build.path}">
+	      <arg value="install"/>
+	     </exec>
+
+
+	     <!-- Run npm build to perform build output to ./dist -->
+		 <echo message="Calling NPM BUILD" />
+		  <exec dir="." executable="${npm.build.path}">
+		  <arg value="run"/>
+		  <arg value="build"/>
+	     </exec>
+		
+	</target>
+	
 	<target name="create-war"
-            depends="initialize,compile-source,-optimize-web-files,-ivy-resolve-runtime,-load-web-properties"
+            depends="initialize,compile-source, npm-build, -ivy-resolve-runtime,-load-web-properties"
             description="Creates a WAR file">
-		<mkdir dir="${dist.dir}" />
+		<!-- <mkdir dir="${dist.dir}" /> -->
+		<!--
 		<war destfile="${dist.dir}/${war.name}"
              webxml="${web.root}/WEB-INF/web.xml"
              duplicate="fail">
@@ -128,6 +155,8 @@
 				<attribute name="Release-Label" value="${target-version}" />
 				<attribute name="WPT-Version" value="${wpt.version}" />
 			</manifest>
+			
+			
 			<fileset dir="${web.root}">
 				<include name="*" />
 				<include name="css/**" />
@@ -140,8 +169,52 @@
 				<include name="css/**" />
 				<include name="js/**" />
 			</fileset>
+			
+			<fileset dir="${dist.dir}">
+							<include name="*.css" />
+				            <include name="*.html" />
+							<include name="*.map" />
+							<include name="*.js" />
+							<include name="assets/**" />
+						</fileset>
+			
 			<fileset dir="${flex.app.dir}" erroronmissingdir="false" />
 		</war>
+		-->
+		
+		<war destfile="${dist.dir}/${war.name}"  needxmlfile="false">
+					<manifest>
+						<attribute name="Release-Date" value="${iso.8601.timestamp}" />
+						<attribute name="Release-Label" value="${target-version}" />
+						<attribute name="WPT-Version" value="${wpt.version}" />
+					</manifest>
+					
+					<!--
+					<fileset dir="${web.root}">
+						<include name="*" />
+						<include name="css/**" />
+						<include name="images/**" />
+						<include name="js/**" />
+						<include name="app/**" />
+						<include name="pages/**" />
+					</fileset>
+					<fileset dir="${build.dir}">
+						<include name="css/**" />
+						<include name="js/**" />
+					</fileset>
+					-->
+					
+					<fileset dir="${dist.dir}">
+									<include name="*.css" />
+						            <include name="*.html" />
+									<include name="*.map" />
+									<include name="*.js" />
+									<include name="assets/**" />
+								</fileset>
+					
+					<fileset dir="${flex.app.dir}" erroronmissingdir="false" />
+				</war>
+	
 		<antcall target="update-war-for-local" />
 	</target>
 
