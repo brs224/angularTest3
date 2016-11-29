@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+	Copyright 2010: Thomson Reuters Global Resources. All Rights Reserved.
+	Proprietary and Confidential information of TRGR. Disclosure, Use or Reproduction without the written authorization of TRGR is prohibited
+ -->
+
+<web-app id="grcservices" version="2.5"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+    <display-name>GRC Workflow Service</display-name>
+
+    <!-- Spring Configuration Listeners -->
+
+    <!-- Log4j Config -->
+    <listener>
+        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>log4jConfigLocation</param-name>
+        <param-value>classpath:log4j.properties</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>grcworkflow</param-value>
+    </context-param>
+
+    <!-- Spring Config -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml</param-value>
+    </context-param>
+
+
+    <!-- ReST Service -->
+
+    <servlet>
+        <servlet-name>GRC Web Application</servlet-name>
+        <servlet-class>
+            com.sun.jersey.spi.spring.container.servlet.SpringServlet
+        </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>GRC Web Application</servlet-name>
+        <url-pattern>/resources/*</url-pattern>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!--Filter for routing through Safe-->
+    <filter>
+        <filter-name>appAuth</filter-name>
+        <filter-class>com.thomsonreuters.grc.web.SafeAuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>appAuth</filter-name>
+        <url-pattern>/app/*</url-pattern>
+    </filter-mapping>
+
+
+    <!--Smoke Test -->
+    <servlet>
+        <servlet-name>J3CommonsController</servlet-name>
+        <servlet-class>com.thomsonreuters.grc.smokeTest.WebServicesTestServlet</servlet-class>
+        <init-param>
+            <param-name>app.test.impl</param-name>
+            <param-value>com.thomsonreuters.grc.smokeTest.WebServicesSmokeTest</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>J3CommonsController</servlet-name>
+        <url-pattern>/J3Commons/*</url-pattern>
+    </servlet-mapping>
+
+
+	<welcome-file-list>
+		<welcome-file>app/index.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>
