@@ -50,20 +50,20 @@
     <servlet-mapping>
         <servlet-name>GRC Web Application</servlet-name>
         <url-pattern>/resources/*</url-pattern>
-        <url-pattern>*</url-pattern>
+        <url-pattern></url-pattern>
     </servlet-mapping>
 
 
-    <!--Filter for routing through Safe-->
+    <!--Filter for routing through Safe
     <filter>
         <filter-name>appAuth</filter-name>
         <filter-class>com.thomsonreuters.grc.web.SafeAuthenticationFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>appAuth</filter-name>
-        <url-pattern>*</url-pattern>
+        <url-pattern>/app/*</url-pattern>
     </filter-mapping>
-
+-->
 
     <!--Smoke Test -->
     <servlet>
