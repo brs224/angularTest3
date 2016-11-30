@@ -145,64 +145,15 @@
 	<target name="create-war"
             depends="initialize,compile-source, npm-build, -ivy-resolve-runtime,-load-web-properties"
             description="Creates a WAR file">
-		<!-- <mkdir dir="${dist.dir}" /> -->
-		<!--
-		<war destfile="${dist.dir}/${war.name}"
-             webxml="${web.root}/WEB-INF/web.xml"
-             duplicate="fail">
-			<manifest>
-				<attribute name="Release-Date" value="${iso.8601.timestamp}" />
-				<attribute name="Release-Label" value="${target-version}" />
-				<attribute name="WPT-Version" value="${wpt.version}" />
-			</manifest>
-			
-			
-			<fileset dir="${web.root}">
-				<include name="*" />
-				<include name="css/**" />
-				<include name="images/**" />
-				<include name="js/**" />
-				<include name="app/**" />
-				<include name="pages/**" />
-			</fileset>
-			<fileset dir="${build.dir}">
-				<include name="css/**" />
-				<include name="js/**" />
-			</fileset>
-			
-			<fileset dir="${dist.dir}">
-							<include name="*.css" />
-				            <include name="*.html" />
-							<include name="*.map" />
-							<include name="*.js" />
-							<include name="assets/**" />
-						</fileset>
-			
-			<fileset dir="${flex.app.dir}" erroronmissingdir="false" />
-		</war>
-		-->
 		
-		<war destfile="${dist.dir}/${war.name}"  needxmlfile="false">
-					<manifest>
+		<war destfile="${dist.dir}/${war.name}"
+		             webxml="${web.root}/WEB-INF/web.xml"
+		             duplicate="fail">
+			        <manifest>
 						<attribute name="Release-Date" value="${iso.8601.timestamp}" />
 						<attribute name="Release-Label" value="${target-version}" />
 						<attribute name="WPT-Version" value="${wpt.version}" />
 					</manifest>
-					
-					<!--
-					<fileset dir="${web.root}">
-						<include name="*" />
-						<include name="css/**" />
-						<include name="images/**" />
-						<include name="js/**" />
-						<include name="app/**" />
-						<include name="pages/**" />
-					</fileset>
-					<fileset dir="${build.dir}">
-						<include name="css/**" />
-						<include name="js/**" />
-					</fileset>
-					-->
 					
 					<fileset dir="${dist.dir}">
 									<include name="*.css" />

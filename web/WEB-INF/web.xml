@@ -50,7 +50,6 @@
     <servlet-mapping>
         <servlet-name>GRC Web Application</servlet-name>
         <url-pattern>/resources/*</url-pattern>
-        <url-pattern></url-pattern>
     </servlet-mapping>
 
 
