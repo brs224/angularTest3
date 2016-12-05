@@ -18,6 +18,8 @@
     "@angular/platform-browser-dynamic": "~2.2.0",
     "@angular/router": "~3.2.0",
     "core-js": "^2.4.1",
+    "es6-shim":"https://github.com/paulmillr/es6-shim",
+    "reflect-metadata":"",
     "rxjs": "5.0.0-beta.12",
     "zone.js": "^0.6.25"
   },
@@ -33,6 +35,7 @@
     "html-webpack-plugin": "^2.15.0",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
+    "karma-chrome-launcher":"^2.0.0",
     "karma-jasmine": "^1.0.2",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-sourcemap-loader": "^0.3.7",
@@ -42,9 +45,14 @@
     "raw-loader": "^0.5.1",
     "rimraf": "^2.5.2",
     "style-loader": "^0.13.1",
+    "tslint":  "^3.13.0",
+    "tslint-loader":"^3.2.1",
+    "ts-loader":"^1.2.2",
     "typescript": "^2.0.3",
+    "typings":"^2.0.0",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1",
     "webpack-merge": "^0.14.0"
+
   }
 }
