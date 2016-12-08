@@ -17,7 +17,7 @@ module.exports = {
     resolve: {
         extensions: ['', '.js', '.ts'],
         modulesDirectories: ['node_modules'],
-        root: path.resolve('.', 'src')
+        root: path.resolve('.', 'web')
     },
     tslint: {
         emitErrors: true
