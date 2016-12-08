@@ -2,6 +2,7 @@
 
 import { TestBed, ComponentFixture,async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import {  Sample1Component } from  './components/sample1/sample1.component'
 
 let app: AppComponent;
 let fixture: ComponentFixture<AppComponent>;
@@ -9,7 +10,7 @@ let fixture: ComponentFixture<AppComponent>;
 describe('App: HelloWorld', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ AppComponent ],
+      declarations: [ AppComponent ,  Sample1Component],
     })
     .compileComponents()
     .then(() => {

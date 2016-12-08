@@ -3,7 +3,7 @@
 module.exports = function(config) {
     config.set({
         autoWatch: true,
-        browsers: ['Chrome','PhantomJS'],
+        browsers: ['PhantomJS'],
         files: [
             './node_modules/es6-shim/es6-shim.min.js',
             './config/karma.entry.js'
